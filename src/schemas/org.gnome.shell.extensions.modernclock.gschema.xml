@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.modernclock" path="/org/gnome/shell/extensions/modernclock/">
+    <key name="use-24h" type="b">
+      <default>false</default>
+      <summary>Use 24-hour format</summary>
+      <description>Use 24-hour time format instead of 12-hour AM/PM</description>
+    </key>
+    <key name="date-format" type="s">
+      <default>'text'</default>
+      <summary>Date format</summary>
+      <description>text = 01 MAY 2026, numeric = 01.05.2026</description>
+    </key>
+    <key name="position" type="s">
+      <default>'center'</default>
+      <summary>Widget position</summary>
+    </key>
+  </schema>
+</schemalist>

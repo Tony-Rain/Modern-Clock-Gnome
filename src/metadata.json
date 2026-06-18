@@ -2,7 +2,14 @@
     "uuid": "modernclock@gnome-port",
     "name": "Modern Clock",
     "description": "KDE Modern Clock style widget for GNOME. Inspired by Prayag2's kde_modernclock.",
-    "shell-version": ["46", "47", "48", "49", "50"],
+    "shell-version": [
+        "46",
+        "47",
+        "48",
+        "49",
+        "50"
+    ],
     "version": 1,
-    "url": "https://github.com/Prayag2/kde_modernclock"
+    "url": "https://github.com/Prayag2/kde_modernclock",
+    "settings-schema": "org.gnome.shell.extensions.modernclock"
 }

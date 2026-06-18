@@ -20,7 +20,6 @@ import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 const POSITION  = 'center';
 const MARGIN_X  = 60;
 const MARGIN_Y  = 80;
-const USE_24H   = false;
 const TIME_CHAR = '-';
 
 const DAYS   = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
@@ -55,6 +54,20 @@ function buildStyles(monitorHeight) {
 export default class ModernClockExtension extends Extension {
 
     enable() {
+        // ── Load settings
+        this._settings = this.getSettings();
+        this._settingsChangedId = this._settings.connect('changed', (s, key) => {
+            this._updateClock();
+            if (key === 'position') this._reposition();
+        });
+
+        // ── Load settings
+        this._settings = this.getSettings();
+        this._settingsChangedId = this._settings.connect('changed', (s, key) => {
+            this._updateClock();
+            if (key === 'position') this._reposition();
+        });
+
         // ── Автоустановка шрифтов ────────────────────────────────────────
         this._installFonts();
 
@@ -124,8 +137,13 @@ export default class ModernClockExtension extends Extension {
         });
 
         this._monitorsChangedId = Main.layoutManager.connect(
-            'monitors-changed', () => this._rescaleAndReposition()
+            'monitors-changed', () => { this._rescaleAndReposition(); this._setupExtraMonitors(); }
         );
+
+        // Multi-monitor
+        this._extraWidgets = [];
+        this._extraWidgets = [];
+        this._setupExtraMonitors();
 
         this._timeoutId = GLib.timeout_add_seconds(
             GLib.PRIORITY_DEFAULT, 1, () => {
@@ -149,6 +167,20 @@ export default class ModernClockExtension extends Extension {
             this._container.destroy();
             this._container = null;
         }
+        if (this._settingsChangedId) {
+            this._settings.disconnect(this._settingsChangedId);
+            this._settingsChangedId = null;
+        }
+        this._settings = null;
+
+        if (this._extraWidgets) {
+            for (const w of this._extraWidgets) {
+                try { if (w.container.get_parent()) w.container.get_parent().remove_child(w.container); } catch(e) {}
+                w.container.destroy();
+            }
+            this._extraWidgets = [];
+        }
+
         if (this._initTimeoutId) {
             GLib.source_remove(this._initTimeoutId);
             this._initTimeoutId = null;
@@ -250,6 +282,89 @@ export default class ModernClockExtension extends Extension {
         }
     }
 
+    _setupExtraMonitors() {
+        // Remove old extra widgets
+        if (this._extraWidgets) {
+            for (const w of this._extraWidgets) {
+                try { if (w.container.get_parent()) w.container.get_parent().remove_child(w.container); } catch(e) {}
+                w.container.destroy();
+            }
+            this._extraWidgets = [];
+        }
+
+        const primaryIndex = Main.layoutManager.primaryIndex;
+        const monitors = Main.layoutManager.monitors;
+
+        for (let i = 0; i < monitors.length; i++) {
+            if (i === primaryIndex) continue;
+
+            const mon = monitors[i];
+            const styles = buildStyles(mon.height || 1080);
+
+            const dayLabel = new St.Label({ style: styles.day, x_align: Clutter.ActorAlign.CENTER, x_expand: true });
+            const dateLabel = new St.Label({ style: styles.date, x_align: Clutter.ActorAlign.CENTER, x_expand: true });
+            const timeLabel = new St.Label({ style: styles.time, x_align: Clutter.ActorAlign.CENTER, x_expand: true });
+
+            try {
+                dayLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+                dateLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+                timeLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+            } catch(e) {}
+
+            // Container с BinLayout — центрирование labels
+            const container = new St.Widget({
+                name: 'ModernClockExtra',
+                layout_manager: new Clutter.BinLayout(),
+                reactive: false, can_focus: false, track_hover: false,
+                width: mon.width,
+                height: mon.height,
+                x: mon.x, y: mon.y,
+                // КЛЮЧ: микро-фон даёт actor allocation в stage view
+                // второго монитора, иначе Clutter его не рендерит
+                style: 'background-color: rgba(0,0,0,0.01);',
+            });
+            const inner = new St.BoxLayout({
+                vertical: true,
+                x_align: Clutter.ActorAlign.CENTER,
+                y_align: Clutter.ActorAlign.CENTER,
+            });
+            inner.add_child(dayLabel);
+            inner.add_child(dateLabel);
+            inner.add_child(timeLabel);
+            container.add_child(inner);
+            container.opacity = 0;
+
+            // _backgroundGroup (MetaBackgroundGroup) — culling прячет под окнами
+            Main.layoutManager._backgroundGroup.add_child(container);
+            this._extraWidgets.push({ container, dayLabel, dateLabel, timeLabel, monitor: mon });
+        }
+
+        this._updateClock();
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+            this._repositionAll();
+            for (const w of this._extraWidgets) w.container.opacity = 255;
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    _repositionAll() {
+        this._reposition();
+        const POSITION = this._settings.get_string('position');
+        for (const w of this._extraWidgets) {
+            const mon = w.monitor;
+            let x, y, h = w.container.height;
+            if (h < 10) h = 100;
+            switch (POSITION) {
+                case 'top-left': x = mon.x + MARGIN_X; y = mon.y + MARGIN_Y; break;
+                case 'bottom-right': x = mon.x + mon.width - w.container.width - MARGIN_X; y = mon.y + mon.height - h - MARGIN_Y; break;
+                case 'bottom-left': x = mon.x + MARGIN_X; y = mon.y + mon.height - h - MARGIN_Y; break;
+                case 'top-right': x = mon.x + mon.width - w.container.width - MARGIN_X; y = mon.y + MARGIN_Y; break;
+                case 'center': default: w.container.width = mon.width; x = mon.x; y = mon.y + (mon.height - h) / 2; break;
+            }
+            w.container.set_position(Math.round(x), Math.round(y));
+        }
+    }
+
     _reposition() {
         if (!this._container) return;
 
@@ -298,13 +413,19 @@ export default class ModernClockExtension extends Extension {
         this._dayLabel.set_text(DAYS[now.getDay()]);
 
         const dd  = String(now.getDate()).padStart(2, '0');
-        const mmm = MONTHS[now.getMonth()];
-        this._dateLabel.set_text(`${dd} ${mmm} ${now.getFullYear()}`);
+        const dateFormat = this._settings.get_string('date-format');
+        if (dateFormat === 'numeric') {
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            this._dateLabel.set_text(`${dd}.${mm}.${now.getFullYear()}`);
+        } else {
+            const mmm = MONTHS[now.getMonth()];
+            this._dateLabel.set_text(`${dd} ${mmm} ${now.getFullYear()}`);
+        }
 
         let hours = now.getHours();
         const mins = String(now.getMinutes()).padStart(2, '0');
         let t;
-        if (USE_24H) {
+        if (this._settings.get_boolean('use-24h')) {
             t = `${String(hours).padStart(2, '0')}:${mins}`;
         } else {
             const ampm = hours < 12 ? 'AM' : 'PM';
@@ -312,5 +433,17 @@ export default class ModernClockExtension extends Extension {
             t = `${String(h12).padStart(2, '0')}:${mins} ${ampm}`;
         }
         this._timeLabel.set_text(`${TIME_CHAR} ${t} ${TIME_CHAR}`);
+
+        // Обновляем extra-виджеты на других мониторах
+        if (this._extraWidgets) {
+            const dayText = this._dayLabel.text;
+            const dateText = this._dateLabel.text;
+            const timeText = this._timeLabel.text;
+            for (const w of this._extraWidgets) {
+                w.dayLabel.set_text(dayText);
+                w.dateLabel.set_text(dateText);
+                w.timeLabel.set_text(timeText);
+            }
+        }
     }
 }
