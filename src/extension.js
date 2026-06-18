@@ -190,6 +190,10 @@ export default class ModernClockExtension extends Extension {
             GLib.source_remove(this._correctTimeoutId);
             this._correctTimeoutId = null;
         }
+        if (this._fadeInTimeoutId) {
+            GLib.source_remove(this._fadeInTimeoutId);
+            this._fadeInTimeoutId = null;
+        }
         if (this._dayLabel) {
             this._dayLabel.destroy();
             this._dayLabel = null;
@@ -349,9 +353,14 @@ export default class ModernClockExtension extends Extension {
         }
 
         this._updateClock();
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+        if (this._fadeInTimeoutId) {
+            GLib.source_remove(this._fadeInTimeoutId);
+            this._fadeInTimeoutId = null;
+        }
+        this._fadeInTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
             this._repositionAll();
             for (const w of this._extraWidgets) w.container.opacity = 255;
+            this._fadeInTimeoutId = null;
             return GLib.SOURCE_REMOVE;
         });
     }

@@ -1,3 +1,5 @@
+.PHONY: install uninstall dist
+
 UUID = modernclock@gnome-port
 EXT_DIR = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 FONT_DIR = $(HOME)/.local/share/fonts/modernclock
@@ -20,5 +22,5 @@ uninstall:
 
 dist:
 	mkdir -p dist
-	cd src && zip -r ../dist/$(UUID).zip extension.js metadata.json stylesheet.css prefs.js fonts/ schemas/
+	cd src && zip -r ../dist/$(UUID).zip extension.js metadata.json stylesheet.css prefs.js fonts/ schemas/ -x "schemas/gschemas.compiled"
 	@echo "✓ Archive: dist/$(UUID).zip"
