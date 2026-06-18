@@ -12,6 +12,7 @@ import Gio from 'gi://Gio';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import Pango from 'gi://Pango';
+import PangoCairo from 'gi://PangoCairo';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -275,7 +276,15 @@ export default class ModernClockExtension extends Extension {
                 // Синхронный вызов fc-cache — ждём завершения,
                 // чтобы шрифт был доступен сразу при первом enable()
                 GLib.spawn_command_line_async('fc-cache -f');
-                log('[ModernClock] fc-cache completed (sync)');
+                log('[ModernClock] fc-cache completed');
+                // Force Pango to re-read fonts in current session
+                try {
+                    let fontMap = PangoCairo.FontMap.get_default();
+                    fontMap.config_changed();
+                    log('[ModernClock] Pango font map refreshed');
+                } catch(e) {
+                    log('[ModernClock] font map refresh failed: ' + e.message);
+                }
             } catch (e) {
                 log(`[ModernClock] fc-cache failed: ${e.message}`);
             }
