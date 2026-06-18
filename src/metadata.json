@@ -9,7 +9,7 @@
         "49",
         "50"
     ],
-    "version": 1,
+    "version": 2,
     "url": "https://github.com/Prayag2/kde_modernclock",
     "settings-schema": "org.gnome.shell.extensions.modernclock"
 }
