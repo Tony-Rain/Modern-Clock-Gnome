@@ -10,8 +10,10 @@ GNOME Shell extension — a port of [KDE Modern Clock](https://github.com/Prayag
 
 - Exact KDE Modern Clock design (Anurati font, Mond style)
 - GNOME 46–50
+- Multi-monitor support — renders on every display, correct z-order under windows
 - Auto-scaling based on monitor resolution
 - Auto font installation on first run
+- In-app settings: 24-hour format, date format
 - Desktop widget, rendered below all windows
 - Wayland & X11
 
@@ -56,13 +58,32 @@ Log out and log back in for the extension to load.
 
 ## Configuration
 
-Edit `~/.local/share/gnome-shell/extensions/modernclock@gnome-port/extension.js`, constants at the top:
+### Settings UI
+
+Open the settings window:
+
+```bash
+gnome-extensions prefs modernclock@gnome-port
+```
+
+Or open the **Extensions** app → Modern Clock → the gear icon.
+
+Available there:
+- **24-hour format** — toggle between 12h AM/PM and 24h
+- **Date format** — text (`01 MAY 2026`) or numeric (`01.05.2026`)
+
+### Advanced: position, margins, character
+
+Not exposed in the Settings UI yet — edit the constants at the top of `extension.js` directly:
+
+```bash
+~/.local/share/gnome-shell/extensions/modernclock@gnome-port/extension.js
+```
 
 ```javascript
 const POSITION  = 'center';      // center | top-right | top-left | bottom-right | bottom-left
 const MARGIN_X  = 60;            // horizontal margin
 const MARGIN_Y  = 80;            // vertical margin
-const USE_24H   = false;         // true = 24h, false = 12h AM/PM
 const TIME_CHAR = '-';           // character around time
 ```
 
@@ -96,6 +117,11 @@ fc-cache -f
 ## Troubleshooting
 
 **Widget not visible** — make sure you logged out and back in (required on Wayland).
+
+**Settings window won't open** — make sure the schema compiled correctly:
+```bash
+glib-compile-schemas ~/.local/share/gnome-shell/extensions/modernclock@gnome-port/schemas/
+```
 
 **Wrong font** — check if Anurati is installed:
 ```bash

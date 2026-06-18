@@ -10,8 +10,10 @@ GNOME Shell extension — порт [KDE Modern Clock](https://github.com/Prayag2
 
 - Точный дизайн KDE Modern Clock (шрифт Anurati, стиль Mond)
 - GNOME 46–50
+- Поддержка нескольких мониторов — рендерится на каждом экране, корректный z-order под окнами
 - Автоматическое масштабирование под разрешение монитора
 - Автоустановка шрифтов при первом запуске
+- Настройки прямо в интерфейсе: 24-часовой формат, формат даты
 - Виджет на рабочем столе, под всеми окнами
 - Wayland и X11
 
@@ -56,13 +58,32 @@ make install
 
 ## Настройка
 
-Отредактируй `~/.local/share/gnome-shell/extensions/modernclock@gnome-port/extension.js`, константы в начале файла:
+### Через интерфейс настроек
+
+Открой окно настроек:
+
+```bash
+gnome-extensions prefs modernclock@gnome-port
+```
+
+Или через приложение **Extensions** → Modern Clock → значок шестерёнки.
+
+Там доступно:
+- **24-часовой формат** — переключатель между 12ч AM/PM и 24ч
+- **Формат даты** — текстовый (`01 MAY 2026`) или числовой (`01.05.2026`)
+
+### Дополнительно: позиция, отступы, символ
+
+Этого пока нет в окне настроек — правится напрямую в константах в начале `extension.js`:
+
+```bash
+~/.local/share/gnome-shell/extensions/modernclock@gnome-port/extension.js
+```
 
 ```javascript
 const POSITION  = 'center';      // center | top-right | top-left | bottom-right | bottom-left
 const MARGIN_X  = 60;            // отступ по горизонтали
 const MARGIN_Y  = 80;            // отступ по вертикали
-const USE_24H   = false;         // true = 24ч, false = 12ч AM/PM
 const TIME_CHAR = '-';           // символ вокруг времени
 ```
 
@@ -78,8 +99,6 @@ rm -rf ~/.local/share/gnome-shell/extensions/modernclock@gnome-port
 ```
 
 ### Если устанавливал из исходников (Способ 2)
-
-
 
 ```bash
 cd modern-clock-gnome
@@ -98,6 +117,11 @@ fc-cache -f
 ## Решение проблем
 
 **Виджет не появился** — перелогинься (обязательно на Wayland).
+
+**Окно настроек не открывается** — проверь что схема скомпилирована:
+```bash
+glib-compile-schemas ~/.local/share/gnome-shell/extensions/modernclock@gnome-port/schemas/
+```
 
 **Неправильный шрифт** — проверь установку:
 ```bash
