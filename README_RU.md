@@ -17,6 +17,26 @@ GNOME Shell extension — порт [KDE Modern Clock](https://github.com/Prayag2
 - Виджет на рабочем столе, под всеми окнами
 - Wayland и X11
 
+## Поддержка нескольких мониторов
+
+Отрисовка виджета на дополнительных мониторах в Wayland — нетривиальная задача. Если добавить `St.BoxLayout` в `Main.layoutManager._backgroundGroup`, на основном мониторе всё работает, но на дополнительных актор получает **нулевой allocation** в `ClutterStageView` вторичного монитора — и просто не рендерится, без каких-либо ошибок.
+
+**Решение:** добавить почти невидимый фон контейнеру:
+
+```javascript
+const container = new St.BoxLayout({
+    style: 'background-color: rgba(0, 0, 0, 0.01);',
+    // ...
+});
+Main.layoutManager._backgroundGroup.add_child(container);
+```
+
+Наличие «чего-то для отрисовки» заставляет Clutter выделить реальный allocation в `ClutterStageView` дополнительного монитора. В сочетании с `_backgroundGroup` (реализует `MetaCullable`) виджет корректно отображается **под всеми окнами на каждом мониторе**, переживает смену обоев и горячее подключение мониторов.
+
+Это поведение нигде не задокументировано в руководстве по написанию расширений GNOME Shell — обнаружено эмпирически в процессе разработки этого расширения.
+
+> Проверено на GNOME 46–50, Wayland.
+
 ## Скриншоты
 
 ![Modern Clock](assets/Modern-Clock1.jpg)

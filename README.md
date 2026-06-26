@@ -17,6 +17,26 @@ GNOME Shell extension — a port of [KDE Modern Clock](https://github.com/Prayag
 - Desktop widget, rendered below all windows
 - Wayland & X11
 
+## Multi-monitor support
+
+Rendering a widget on secondary monitors in Wayland is non-trivial. Adding a `St.BoxLayout` to `Main.layoutManager._backgroundGroup` works on the primary monitor, but on secondary monitors the actor gets **zero allocation** in the secondary `ClutterStageView` — it simply doesn't render, with no errors.
+
+**The fix:** add a near-invisible background to the container:
+
+```javascript
+const container = new St.BoxLayout({
+    style: 'background-color: rgba(0, 0, 0, 0.01);',
+    // ...
+});
+Main.layoutManager._backgroundGroup.add_child(container);
+```
+
+Giving the actor something to paint forces Clutter to assign it a real allocation in the secondary monitor's stage view. Combined with `_backgroundGroup` (which implements `MetaCullable`), the widget renders correctly **below all windows on every monitor**, survives wallpaper changes and monitor hotplug.
+
+This behaviour is not documented in the GNOME Shell extension guides — discovered empirically while building this extension.
+
+> Tested on GNOME 46–50, Wayland.
+
 ## Screenshots
 
 ![Modern Clock](assets/Modern-Clock1.jpg)
