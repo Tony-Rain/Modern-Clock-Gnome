@@ -124,6 +124,12 @@ export default class ModernClockExtension extends Extension {
         // Добавляем в _backgroundGroup — под окнами, на рабочем столе
         Main.layoutManager._backgroundGroup.add_child(this._container);
 
+        // Авто-репозиция при изменении высоты (поздняя дорисовка шрифтов
+        // меняет аллокацию — без этого виджет «застревает» ниже центра)
+        this._heightNotifyId = this._container.connect(
+            'notify::height', () => this._reposition()
+        );
+
         // Позиционирование с микрозадержкой
         this._initTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
             this._reposition();
@@ -164,6 +170,10 @@ export default class ModernClockExtension extends Extension {
             this._monitorsChangedId = null;
         }
         if (this._container) {
+            if (this._heightNotifyId) {
+                this._container.disconnect(this._heightNotifyId);
+                this._heightNotifyId = null;
+            }
             Main.layoutManager._backgroundGroup.remove_child(this._container);
             this._container.destroy();
             this._container = null;
@@ -372,6 +382,8 @@ export default class ModernClockExtension extends Extension {
             const mon = w.monitor;
             let x, y, h = w.container.height;
             if (h < 10) h = 100;
+            const [, natH] = w.container.get_preferred_height(-1);
+            if (natH > h) h = natH;
             switch (POSITION) {
                 case 'top-left': x = mon.x + MARGIN_X; y = mon.y + MARGIN_Y; break;
                 case 'bottom-right': x = mon.x + mon.width - w.container.width - MARGIN_X; y = mon.y + mon.height - h - MARGIN_Y; break;
@@ -389,8 +401,12 @@ export default class ModernClockExtension extends Extension {
         const monitor = Main.layoutManager.primaryMonitor;
         if (!monitor) return;
 
-        let w = this._container.width;
-        let h = this._container.height;
+        // get_preferred_*() возвращает [min, natural] — натуральная высота
+        // считается из стилей/шрифтов до аллокации, поэтому стабильнее .height
+        const [, natH] = this._container.get_preferred_height(-1);
+        const [, natW] = this._container.get_preferred_width(-1);
+        let w = Math.max(this._container.width, natW);
+        let h = Math.max(this._container.height, natH);
         if (h < 10) h = 100;
 
         let x, y;
