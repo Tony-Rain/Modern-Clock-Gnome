@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: CC0-1.0
 # SPDX-FileCopyrightText: No rights reserved
 
-.PHONY: disable enable format install lint pack pot prefs reset test uninstall
+.PHONY: disable enable format install lint pack pot prefs reset shexli test test-legacy uninstall
 
 # set data to default if not it is not already set
 XDG_DATA_HOME ?= $(HOME)/.local/share
@@ -54,14 +54,24 @@ reset:
 	@echo ""
 
 test: install
-	@echo "Launching nested shell (GNOME 49+)..."
-	G_MESSAGES_DEBUG='GNOME Shell' exec dbus-run-session gnome-shell --devkit
+	@echo "Launching nested shell..."
+	G_MESSAGES_DEBUG='GNOME Shell' dbus-run-session gnome-shell --devkit
+	@echo ""
+
+test-legacy: install
+	@echo "Launching nested shell (GNOME <49)..."
+	G_MESSAGES_DEBUG='GNOME Shell' dbus-run-session gnome-shell --nested
 	@echo ""
 
 $(NODE_MODULES_STAMP): package-lock.json
 	npm ci
 	@touch $(NODE_MODULES_STAMP)
 	@echo "✓ Installed NodeJS modules."
+
+shexli: pack
+	@echo "Running the Shexli static analyzer..."
+	shexli dist/$(UUID).shell-extension.zip
+	@echo ""
 
 format: $(NODE_MODULES_STAMP)
 	@echo "Running Prettier to fix format..."
