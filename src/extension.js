@@ -167,18 +167,22 @@ export default class ModernClockExtension extends Extension {
 
         this._themeContext.disconnectObject(this);
         this._themeContext = null;
+        this._themeColor = null;
 
         if (this._fontNotification.source) {
             this._fontNotification.notification.disconnectObject(this);
             this._fontNotification.source.destroy();
-            this._fontNotification = null;
         }
+        this._fontNotification = null;
 
         this._settings.disconnectObject(this);
         this._settings = null;
 
         this._destroyAllClocks();
         this._clockWidgets = [];
+        this._anuratiWeekdaySupport = null;
+        this._lastMonitorSnapshot = null;
+        this._lastMinute = null;
         this._logger = null;
     }
     //#endregion
@@ -544,4 +548,3 @@ export default class ModernClockExtension extends Extension {
     }
     //#endregion
 }
-
