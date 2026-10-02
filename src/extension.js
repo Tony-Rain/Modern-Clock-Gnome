@@ -99,21 +99,21 @@ export default class ModernClockExtension extends Extension {
 
         // ── Build clocks when the layout is ready ────────────────────────────
         this._clockWidgets = [];
-        this._ready = false;
         this._lastMonitorSnapshot = null;
+        this._startupToken = { ready: false };
 
         if (Main.layoutManager._startingUp) {
             Main.layoutManager.connectObject(
                 'startup-complete',
                 () => {
-                    Main.layoutManager.disconnectObject(this);
-                    this._ready = true;
+                    Main.layoutManager.disconnectObject(this._startupToken);
+                    this._startupToken.ready = true;
                     this._buildAllClocks();
                 },
-                this
+                this._startupToken
             );
         } else {
-            this._ready = true;
+            this._startupToken.ready = true;
             this._buildAllClocks();
         }
 
@@ -162,6 +162,8 @@ export default class ModernClockExtension extends Extension {
         global.display.disconnectObject(this);
 
         Main.layoutManager.disconnectObject(this);
+        Main.layoutManager.disconnectObject(this._startupToken);
+        this._startupToken = null;
 
         this._themeContext.disconnectObject(this);
         this._themeContext = null;
@@ -183,7 +185,7 @@ export default class ModernClockExtension extends Extension {
 
     //#region buildAllClocks
     _buildAllClocks() {
-        if (!this._ready) return;
+        if (!this._startupToken.ready) return;
 
         // Remove old clocks
         this._destroyAllClocks();
@@ -542,3 +544,4 @@ export default class ModernClockExtension extends Extension {
     }
     //#endregion
 }
+
