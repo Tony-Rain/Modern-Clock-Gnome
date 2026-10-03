@@ -169,10 +169,7 @@ export default class ModernClockExtension extends Extension {
         this._themeContext = null;
         this._themeColor = null;
 
-        if (this._fontNotification.source) {
-            this._fontNotification.notification.disconnectObject(this);
-            this._fontNotification.source.destroy();
-        }
+        if (this._fontNotification.source) this._fontNotification.source.destroy();
         this._fontNotification = null;
 
         this._settings.disconnectObject(this);
@@ -519,6 +516,11 @@ export default class ModernClockExtension extends Extension {
             title: this.metadata.name,
             iconName: 'dialog-information', // or extension icon
         });
+        this._fontNotification.source.connectObject(
+            'destroy',
+            () => this._fontNotification.source = null,
+            this
+        );
         Main.messageTray.add(this._fontNotification.source);
 
         this._fontNotification.notification = new MessageTray.Notification({
