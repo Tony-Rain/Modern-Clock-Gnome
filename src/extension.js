@@ -396,7 +396,7 @@ export default class ModernClockExtension extends Extension {
         const styleColor = colorEnabled ? color : this._themeColor;
 
         return (
-            `font-family: ${safeFontFace}, sans-serif;` +
+            `font-family: '${safeFontFace}', sans-serif;` +
             `font-size: ${fontSize}px;` +
             `letter-spacing: ${letterSpacing}px;` +
             `padding-top: ${paddingTop}px;` +
