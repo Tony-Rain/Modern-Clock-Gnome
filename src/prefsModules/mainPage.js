@@ -51,20 +51,18 @@ export function createMainPage(settings, metadata, shellVersion, { pageTitle, pa
 
     //#region Find format language
     const systemLocaleSettings = new Gio.Settings({ schema_id: 'org.gnome.system.locale' });
-    function getLcTimeLanguage() {
-        let lcTime;
-        // Explicit "Formats" override
-        const regionOverride = systemLocaleSettings.get_string('region');
-        if (regionOverride !== '') lcTime = regionOverride;
-        else lcTime = GLib.get_language_names_with_category('LC_TIME')[0]; // Process
-        return lcTime.split(/[_.@]/)[0];
-    }
+    // Explicit "Formats" override, otherwise the process's LC_TIME
+    const regionOverride = systemLocaleSettings.get_string('region');
+    const lcTime =
+        regionOverride !== ''
+            ? regionOverride
+            : GLib.get_language_names_with_category('LC_TIME')[0];
+    const lcTimeLang = lcTime.split(/[_.@]/)[0];
+    const isLcTimeEnglish = ['en', 'C', 'POSIX'].includes(lcTimeLang);
     //#endregion
 
     //#region Language
     // only relevant if the time format language isn't already in English
-    const lcTimeLang = getLcTimeLanguage();
-    const isLcTimeEnglish = ['en', 'C', 'POSIX'].includes(lcTimeLang);
     if (!isLcTimeEnglish) {
         const langGroup = new Adw.PreferencesGroup({ title: _('Language') });
         page.add(langGroup);
@@ -102,9 +100,7 @@ export function createMainPage(settings, metadata, shellVersion, { pageTitle, pa
             margin_bottom: 8,
             css_classes: ['subtitle'],
         });
-        function updateLangSub(keyIndex) {
-            langSubLabel.set_label(langModes[keyIndex].hint);
-        }
+        const updateLangSub = keyIndex => langSubLabel.set_label(langModes[keyIndex].hint);
         langSubRow.set_child(langSubLabel);
 
         // Language Toggle
@@ -148,13 +144,12 @@ export function createMainPage(settings, metadata, shellVersion, { pageTitle, pa
             });
         }
 
-        function syncLangFromSettings() {
+        settings.connect('changed::language-mode', () => {
             const mode = settings.get_enum('language-mode');
             if (shellVersion >= 48) langToggleGroup.set_active(mode);
             else langRow.set_selected(mode);
             updateLangSub(mode);
-        }
-        settings.connect('changed::language-mode', syncLangFromSettings);
+        });
 
         langGroup.add(langRow);
         langGroup.add(langSubRow);

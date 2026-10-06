@@ -69,14 +69,13 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
 
     const defaultFont = settings.get_default_value(keys.font).deep_unpack();
     const fontFamilies = PangoCairo.FontMap.get_default().list_families();
-
-    function isValidFontFamily(family) {
-        if (!family) return false;
-        return fontFamilies.some(font => font.get_name().toLowerCase() === family.toLowerCase());
-    }
+    const isValidFontFamily = family =>
+        family
+            ? fontFamilies.some(font => font.get_name().toLowerCase() === family.toLowerCase())
+            : false;
 
     let syncingFont = false;
-    function syncFontFromSettings() {
+    const syncFontFromSettings = () => {
         const font = settings.get_string(keys.font);
         const desc = Pango.FontDescription.from_string(font);
         syncingFont = true;
@@ -89,7 +88,7 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
 
         fontResetButton.set_visible(font !== defaultFont);
         syncingFont = false;
-    }
+    };
     syncFontFromSettings();
 
     fontButton.connect('notify::font-desc', () => {
@@ -101,7 +100,7 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
         fontResetButton.set_visible(desc.to_string() !== defaultFont);
     });
     fontResetButton.connect('clicked', () => settings.reset(keys.font));
-    settings.connect(`changed::${keys.font}`, () => syncFontFromSettings());
+    settings.connect(`changed::${keys.font}`, syncFontFromSettings);
 
     const fontBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 12 });
     fontBox.append(fontResetButton);
@@ -137,7 +136,7 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
     });
 
     let syncingColor = false;
-    function syncColorFromSettings() {
+    const syncColorFromSettings = () => {
         const rgba = new Gdk.RGBA();
         if (!rgba.parse(settings.get_string(keys.color))) {
             settings.reset(keys.color);
@@ -146,7 +145,7 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
         syncingColor = true;
         colorButton.set_rgba(rgba);
         syncingColor = false;
-    }
+    };
     syncColorFromSettings();
 
     colorButton.connect('notify::rgba', () => {
@@ -154,7 +153,7 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
         if (syncingColor) return;
         settings.set_string(keys.color, colorButton.get_rgba().to_string());
     });
-    settings.connect(`changed::${keys.color}`, () => syncColorFromSettings());
+    settings.connect(`changed::${keys.color}`, syncColorFromSettings);
 
     const toggle = new Gtk.CheckButton({
         tooltip_text: _('Use custom color'),
@@ -179,9 +178,9 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
                 placeholder_text: side === 'left' ? _('Prefix') : _('Suffix'),
                 valign: Gtk.Align.CENTER,
                 hexpand: true,
+                xalign: side === 'left' ? 1 : 0,
             })
     );
-    decoEntries[0].set_alignment(1);
 
     const syncDecoFromSettings = () => {
         const stored = settings.get_strv(keys.deco);
@@ -200,7 +199,7 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
             )
         )
     );
-    settings.connect(`changed::${keys.deco}`, () => syncDecoFromSettings());
+    settings.connect(`changed::${keys.deco}`, syncDecoFromSettings);
 
     const decoBox = new Gtk.Box({
         orientation: Gtk.Orientation.HORIZONTAL,

@@ -17,7 +17,7 @@ import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 import { getAnuratiWeekdaySupport } from './lib/utils.js';
 
 //#region Constants
-// ── Base dimensions for 1080p ────────────────────────────────────────────────
+// -- Base dimensions for 1080p ------------------------------------------------
 const BASE_HEIGHT = 1080;
 const BASE_SIZE = 48;
 const BASE_LS = 16;
@@ -27,7 +27,7 @@ const BASE_PADDING_TOP_TIME = 1;
 // SCALE_MIN * SCALE_MAX = 1 so that slider=0.5 can give scale=1.0
 const SCALE_MIN = 0.25;
 const SCALE_MAX = 4;
-// ── English ──────────────────────────────────────────────────────────────────
+// -- English ------------------------------------------------------------------
 const WEEKDAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 const WEEKDAYS_SHORT = WEEKDAYS.map(m => m.slice(0, 3));
 const MONTHS = [
@@ -45,24 +45,31 @@ const MONTHS = [
     'DECEMBER',
 ];
 const MONTHS_SHORT = MONTHS.map(m => m.slice(0, 3));
-// ── Color ────────────────────────────────────────────────────────────────────
+// -- Color --------------------------------------------------------------------
 const HEX_RE = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const RGB_RE = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d*\.?\d+)\s*)?\)$/i;
 const FALLBACK_COLOR = 'rgba(255,255,255,1)'; // white
-// ── Font files ───────────────────────────────────────────────────────────────
+// -- Font files ---------------------------------------------------------------
 const FONT_FILES = ['Anurati.otf', 'Poppins.ttf'];
 //#endregion
 
 export default class ModernClockExtension extends Extension {
     //#region enable
     enable() {
-        // ── Version check ────────────────────────────────────────────────────
+        // -- Version check ----------------------------------------------------
         this._shellVersion = parseFloat(Config.PACKAGE_VERSION);
 
-        // ── Custom extension logger ──────────────────────────────────────────
-        this._logger = this._shellVersion >= 48 ? this.getLogger() : this._getFallbackLogger();
+        // -- Custom extension logger ------------------------------------------
+        const prefix = `[${this.metadata.name}]`;
+        // prettier-ignore
+        this._logger =
+            this._shellVersion >= 48
+                ? this.getLogger()
+                : Object.fromEntries(['log', 'warn', 'error', 'debug'].map(
+                    level => [level, (...args) => console[level](prefix, ...args)]
+                ));
 
-        // ── Connect to settings ──────────────────────────────────────────────
+        // -- Get settings -----------------------------------------------------
         this._settings = this.getSettings();
 
         // Setting migration from boolean 'use-24h' to enum 'time-format'
@@ -72,36 +79,16 @@ export default class ModernClockExtension extends Extension {
             this._settings.reset('use-24h');
         }
 
-        this._settings.connectObject(
-            'changed',
-            () => {
-                this._clockWidgets.forEach(clockWidget => {
-                    this._updateClockText(clockWidget);
-                    this._updateClockStyle(clockWidget);
-                    this._queuePositionUpdate(clockWidget);
-                });
-            },
-            this
-        );
+        // -- Get theme -------------------------------------------------
+        this._themeContext = St.ThemeContext.get_for_stage(global.stage);
+        this._themeColor = this._getThemeColor();
 
-        // ── Install fonts ────────────────────────────────────────────────────
+        // -- Install fonts ----------------------------------------------------
         this._fontNotification = { source: null, notification: null };
         this._anuratiWeekdaySupport = getAnuratiWeekdaySupport();
         this._installFonts();
 
-        // ── Connect to theme ─────────────────────────────────────────────────
-        this._themeContext = St.ThemeContext.get_for_stage(global.stage);
-        this._themeColor = this._getThemeColor();
-        this._themeContext.connectObject(
-            'changed',
-            () => {
-                this._themeColor = this._getThemeColor();
-                this._clockWidgets.forEach(clockWidget => this._updateClockStyle(clockWidget));
-            },
-            this
-        );
-
-        // ── Build clocks when the layout is ready ────────────────────────────
+        // -- Build clocks when the layout is ready ----------------------------
         this._clockWidgets = [];
         this._lastMonitorSnapshot = null;
         this._startupToken = { ready: false };
@@ -121,7 +108,30 @@ export default class ModernClockExtension extends Extension {
             this._buildAllClocks();
         }
 
-        // ── Connect to monitor changes ───────────────────────────────────────
+        // -- Connect to settings changes --------------------------------------
+        this._settings.connectObject(
+            'changed',
+            () => {
+                this._clockWidgets.forEach(clockWidget => {
+                    this._updateClockText(clockWidget);
+                    this._updateClockStyle(clockWidget);
+                    this._queuePositionUpdate(clockWidget);
+                });
+            },
+            this
+        );
+
+        // -- Connect to theme changes -----------------------------------------
+        this._themeContext.connectObject(
+            'changed',
+            () => {
+                this._themeColor = this._getThemeColor();
+                this._clockWidgets.forEach(clockWidget => this._updateClockStyle(clockWidget));
+            },
+            this
+        );
+
+        // -- Connect to monitor changes ---------------------------------------
         Main.layoutManager.connectObject(
             'monitors-changed',
             () => {
@@ -130,14 +140,14 @@ export default class ModernClockExtension extends Extension {
             this
         );
 
-        // ── Connect to work areas changes ────────────────────────────────────
+        // -- Connect to work areas changes ------------------------------------
         global.display.connectObject(
             'workareas-changed',
             () => this._clockWidgets.forEach(clockWidget => this._queuePositionUpdate(clockWidget)),
             this
         );
 
-        // ── Connect to GNOME Clock ───────────────────────────────────────────
+        // -- Connect to GNOME Clock -------------------------------------------
         this._wallClock = new GnomeDesktop.WallClock();
         this._lastMinute = null;
         this._wallClock.connectObject(
@@ -397,9 +407,15 @@ export default class ModernClockExtension extends Extension {
         { fontFace, sizeScale, letterSpacingScale, basePaddingTop, color, colorEnabled }
     ) {
         const safeFontFace = fontFace.replace(/['"\\;{}]/g, '').trim();
-        const fontSize = this._computePx(BASE_SIZE, monitorScale, sizeScale);
-        const letterSpacing = this._computePx(BASE_LS, monitorScale, letterSpacingScale);
-        const paddingTop = this._computePx(basePaddingTop, monitorScale, sizeScale);
+
+        const computePx = (base, sliderValue) => {
+            const userScale = SCALE_MIN * Math.pow(SCALE_MAX / SCALE_MIN, sliderValue);
+            const scale = monitorScale * userScale;
+            return Math.round(base * scale);
+        };
+        const fontSize = computePx(BASE_SIZE, sizeScale);
+        const letterSpacing = computePx(BASE_LS, letterSpacingScale);
+        const paddingTop = computePx(basePaddingTop, sizeScale);
 
         const sanitizeColor = value => {
             if (typeof value !== 'string') return FALLBACK_COLOR;
@@ -430,14 +446,6 @@ export default class ModernClockExtension extends Extension {
             `padding-top: ${paddingTop}px;` +
             `color: ${styleColor};`
         );
-    }
-    //#endregion
-
-    //#region computePx
-    _computePx(base, monitorScale, sliderValue) {
-        const userScale = SCALE_MIN * Math.pow(SCALE_MAX / SCALE_MIN, sliderValue);
-        const scale = monitorScale * userScale;
-        return Math.round(base * scale);
     }
     //#endregion
 
@@ -508,7 +516,12 @@ export default class ModernClockExtension extends Extension {
         const fontsDir = Gio.File.new_for_path(
             GLib.build_filenamev([GLib.get_user_data_dir(), 'fonts', 'modernclock'])
         );
-        if (this._fontsPresent(fontsDir)) return;
+
+        const fontsPresent = () =>
+            fontsDir.query_exists(null) &&
+            FONT_FILES.every(fontName => fontsDir.get_child(fontName).query_exists(null));
+
+        if (fontsPresent()) return;
 
         // prettier-ignore
         this._logger.log(
@@ -526,17 +539,6 @@ export default class ModernClockExtension extends Extension {
             this._notifyFontsInstalled();
         } catch (e) {
             this._logger.warn('failed to install fonts:', e);
-        }
-    }
-    //#endregion
-
-    //#region fontsPresent
-    _fontsPresent(fontsDir) {
-        if (!fontsDir.query_exists(null)) return false;
-        try {
-            return FONT_FILES.every(fontName => fontsDir.get_child(fontName).query_exists(null));
-        } catch {
-            return false;
         }
     }
     //#endregion
@@ -566,18 +568,6 @@ export default class ModernClockExtension extends Extension {
             this
         );
         this._fontNotification.source.addNotification(this._fontNotification.notification);
-    }
-    //#endregion
-
-    //#region getFallbackLogger
-    _getFallbackLogger() {
-        const prefix = `[${this.metadata.name}]`;
-        return {
-            log: (...args) => console.log(prefix, ...args),
-            warn: (...args) => console.warn(prefix, ...args),
-            error: (...args) => console.error(prefix, ...args),
-            debug: (...args) => console.debug(prefix, ...args),
-        };
     }
     //#endregion
 }

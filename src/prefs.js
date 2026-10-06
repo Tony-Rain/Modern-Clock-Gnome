@@ -92,12 +92,11 @@ export default class ModernClockPreferences extends ExtensionPreferences {
             );
         }
 
-        function syncWeekdayFormatFromSettings() {
+        settings.connect('changed::weekday-format', () => {
             const mode = settings.get_enum('weekday-format');
             if (shellVersion >= 48) weekdayFormatToggleGroup.set_active(mode);
             else weekdayFormatRow.set_selected(mode);
-        }
-        settings.connect('changed::weekday-format', syncWeekdayFormatFromSettings);
+        });
 
         weekdayFormatGroup.add(weekdayFormatRow);
         //#endregion
@@ -112,7 +111,7 @@ export default class ModernClockPreferences extends ExtensionPreferences {
         });
 
         const anuratiWeekdaySupport = getAnuratiWeekdaySupport();
-        function updateFormatExampleList(comboRow) {
+        const updateFormatExampleList = () => {
             const mode = settings.get_string('language-mode');
             const useEnglish =
                 mode === 'english' ||
@@ -131,20 +130,20 @@ export default class ModernClockPreferences extends ExtensionPreferences {
                     exampleDate.format('%d %b %Y').toUpperCase(),
                     exampleDate.format('%d %B %Y').toUpperCase(),
                 ];
-            comboRow.model.splice(0, comboRow.model.get_n_items(), strings);
-        }
-        updateFormatExampleList(dateFormatRow);
+            dateFormatRow.model.splice(0, dateFormatRow.model.get_n_items(), strings);
+        };
+        updateFormatExampleList();
 
         dateFormatRow.set_selected(settings.get_enum('date-format'));
         dateFormatRow.connect('notify::selected', () =>
             settings.set_enum('date-format', dateFormatRow.get_selected())
         );
-        settings.connect('changed::language-mode', () => updateFormatExampleList(dateFormatRow));
-
-        function syncDateFormatFromSettings() {
-            dateFormatRow.set_selected(settings.get_enum('date-format'));
-        }
-        settings.connect('changed::date-format', syncDateFormatFromSettings);
+        ['language-mode', 'weekday-format'].forEach(key =>
+            settings.connect(`changed::${key}`, () => updateFormatExampleList())
+        );
+        settings.connect('changed::date-format', () =>
+            dateFormatRow.set_selected(settings.get_enum('date-format'))
+        );
 
         dateFormatGroup.add(dateFormatRow);
         //#endregion
@@ -180,12 +179,11 @@ export default class ModernClockPreferences extends ExtensionPreferences {
             );
         }
 
-        function syncTimeFormatFromSettings() {
+        settings.connect('changed::time-format', () => {
             const mode = settings.get_enum('time-format');
             if (shellVersion >= 48) timeFormatToggleGroup.set_active(mode);
             else timeFormatRow.set_selected(mode);
-        }
-        settings.connect('changed::time-format', syncTimeFormatFromSettings);
+        });
 
         timeFormatGroup.add(timeFormatRow);
         //#endregion
