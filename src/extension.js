@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Clutter from 'gi://Clutter';
-import Gdk from 'gi://Gdk';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GnomeDesktop from 'gi://GnomeDesktop';
@@ -46,8 +45,11 @@ const MONTHS = [
     'DECEMBER',
 ];
 const MONTHS_SHORT = MONTHS.map(m => m.slice(0, 3));
-// ── Others ───────────────────────────────────────────────────────────────
+// ── Color ────────────────────────────────────────────────────────────────────
+const HEX_RE = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+const RGB_RE = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d*\.?\d+)\s*)?\)$/i;
 const FALLBACK_COLOR = 'rgba(255,255,255,1)'; // white
+// ── Font files ───────────────────────────────────────────────────────────────
 const FONT_FILES = ['Anurati.otf', 'Poppins.ttf'];
 //#endregion
 
@@ -401,9 +403,23 @@ export default class ModernClockExtension extends Extension {
 
         const sanitizeColor = value => {
             if (typeof value !== 'string') return FALLBACK_COLOR;
-            const rgba = new Gdk.RGBA();
-            if (!rgba.parse(value)) return FALLBACK_COLOR;
-            return rgba.to_string();
+            const v = value.trim();
+
+            // test HEX format
+            if (HEX_RE.test(v)) return v.toLowerCase();
+
+            // sanitize RGB format
+            const match = RGB_RE.exec(v);
+            if (match) {
+                const clamp = (n, max) => Math.min(Math.max(Number(n), 0), max);
+                const r = Math.round(clamp(match[1], 255));
+                const g = Math.round(clamp(match[2], 255));
+                const b = Math.round(clamp(match[3], 255));
+                const a = match[4] === undefined ? 1 : clamp(match[4], 1);
+                return `rgba(${r},${g},${b},${a})`;
+            }
+
+            return FALLBACK_COLOR;
         };
         const styleColor = colorEnabled ? sanitizeColor(color) : this._themeColor;
 
