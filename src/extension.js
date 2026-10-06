@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import Clutter from 'gi://Clutter';
+import Gdk from 'gi://Gdk';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GnomeDesktop from 'gi://GnomeDesktop';
@@ -45,7 +46,8 @@ const MONTHS = [
     'DECEMBER',
 ];
 const MONTHS_SHORT = MONTHS.map(m => m.slice(0, 3));
-// ── Font files ───────────────────────────────────────────────────────────────
+// ── Others ───────────────────────────────────────────────────────────────
+const FALLBACK_COLOR = 'rgba(255,255,255,1)'; // white
 const FONT_FILES = ['Anurati.otf', 'Poppins.ttf'];
 //#endregion
 
@@ -309,7 +311,7 @@ export default class ModernClockExtension extends Extension {
         // Time
         let time;
         if (this._settings.get_string('time-format') === '24h') {
-            time = `${now.format(`%H:%M`)}`;
+            time = `${now.format('%H:%M')}`;
         } else {
             // Manually calculate AM/PM format because some locales don't support it
             const hours = now.get_hour();
@@ -396,7 +398,14 @@ export default class ModernClockExtension extends Extension {
         const fontSize = this._computePx(BASE_SIZE, monitorScale, sizeScale);
         const letterSpacing = this._computePx(BASE_LS, monitorScale, letterSpacingScale);
         const paddingTop = this._computePx(basePaddingTop, monitorScale, sizeScale);
-        const styleColor = colorEnabled ? color : this._themeColor;
+
+        const sanitizeColor = value => {
+            if (typeof value !== 'string') return FALLBACK_COLOR;
+            const rgba = new Gdk.RGBA();
+            if (!rgba.parse(value)) return FALLBACK_COLOR;
+            return rgba.to_string();
+        };
+        const styleColor = colorEnabled ? sanitizeColor(color) : this._themeColor;
 
         return (
             `font-family: '${safeFontFace}', sans-serif;` +
@@ -444,7 +453,7 @@ export default class ModernClockExtension extends Extension {
         }
 
         if (found) return `rgb(${color.red},${color.green},${color.blue})`;
-        else return `rgba(255,255,255,1)`; // fallback to white
+        else return FALLBACK_COLOR;
     }
     //#endregion
 
