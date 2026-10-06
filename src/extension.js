@@ -269,10 +269,6 @@ export default class ModernClockExtension extends Extension {
     _updateClockText(clockWidget) {
         const now = GLib.DateTime.new_now_local();
         const weekdayFormat = this._settings.get_string('weekday-format');
-        const weekdayDeco = this._settings.get_string('weekday-decoration');
-        const dateDeco = this._settings.get_string('date-decoration');
-        const timeDeco = this._settings.get_string('time-decoration');
-
         const mode = this._settings.get_string('language-mode');
         const useEnglish =
             mode === 'english' ||
@@ -322,9 +318,19 @@ export default class ModernClockExtension extends Extension {
             time = `${now.format(`${h12.toString().padStart(2, '0')}:%M ${ampm}`)}`;
         }
 
-        clockWidget.weekdayLabel.set_text(`${weekdayDeco} ${weekday} ${weekdayDeco}`);
-        clockWidget.dateLabel.set_text(`${dateDeco} ${date} ${dateDeco}`);
-        clockWidget.timeLabel.set_text(`${timeDeco} ${time} ${timeDeco}`);
+        const decorate = (text, decorations) => {
+            let decoArray = Array.isArray(decorations) ? decorations : [];
+            decoArray = [decoArray[0], decoArray[1]].map(item => {
+                if (typeof item === 'string') return item;
+                else return '';
+            });
+            return [decoArray[0], text, decoArray[1]].filter(Boolean).join(' ');
+        };
+        clockWidget.weekdayLabel.set_text(
+            decorate(weekday, this._settings.get_strv('weekday-decorations'))
+        );
+        clockWidget.dateLabel.set_text(decorate(date, this._settings.get_strv('date-decorations')));
+        clockWidget.timeLabel.set_text(decorate(time, this._settings.get_strv('time-decorations')));
     }
     //#endregion
 
@@ -518,7 +524,7 @@ export default class ModernClockExtension extends Extension {
         });
         this._fontNotification.source.connectObject(
             'destroy',
-            () => this._fontNotification.source = null,
+            () => (this._fontNotification.source = null),
             this
         );
         Main.messageTray.add(this._fontNotification.source);

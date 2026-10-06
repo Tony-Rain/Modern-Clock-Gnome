@@ -81,10 +81,10 @@
             <summary>Use custom weekday color</summary>
             <description>Whether the weekday uses its custom color instead of the system accent color.</description>
         </key>
-        <key name='weekday-decoration' type='s'>
-            <default>''</default>
-            <summary>Weekday decoration</summary>
-            <description>Characters displayed around the weekday.</description>
+        <key name='weekday-decorations' type='as'>
+            <default><![CDATA[['','']]]></default>
+            <summary>Weekday decorations</summary>
+            <description>Characters displayed on either side of the weekday.</description>
         </key>
         <key name='weekday-format' enum='org.gnome.shell.extensions.modernclock.weekday-format'>
             <default>'long'</default>
@@ -124,10 +124,10 @@
             <summary>Use custom date color</summary>
             <description>Whether the date uses its custom color instead of the system accent color.</description>
         </key>
-        <key name='date-decoration' type='s'>
-            <default>''</default>
-            <summary>Date decoration</summary>
-            <description>Characters displayed around the date.</description>
+        <key name='date-decorations' type='as'>
+            <default><![CDATA[['','']]]></default>
+            <summary>Date decorations</summary>
+            <description>Characters displayed on either side of the date.</description>
         </key>
         <key name='date-format' enum='org.gnome.shell.extensions.modernclock.date-format'>
             <default>'text'</default>
@@ -167,10 +167,10 @@
             <summary>Use custom time color</summary>
             <description>Whether the time uses its custom color instead of the system accent color.</description>
         </key>
-        <key name='time-decoration' type='s'>
-            <default>'-'</default>
-            <summary>Time decoration</summary>
-            <description>Characters displayed around the time.</description>
+        <key name='time-decorations' type='as'>
+            <default><![CDATA[['-','-']]]></default>
+            <summary>Time decorations</summary>
+            <description>Characters displayed on either side of the time.</description>
         </key>
         <key name='time-format' enum='org.gnome.shell.extensions.modernclock.time-format'>
             <default>'12h'</default>

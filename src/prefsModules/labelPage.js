@@ -38,7 +38,7 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
         trackingScale: `${keyPrefix}-tracking-scale`,
         color: `${keyPrefix}-color`,
         colorEnabled: `${keyPrefix}-color-enabled`,
-        deco: `${keyPrefix}-decoration`,
+        deco: `${keyPrefix}-decorations`,
     };
 
     const appearanceGroup = new Adw.PreferencesGroup({ title: _('Appearance') });
@@ -85,7 +85,7 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
         else if (font !== defaultFont) settings.reset(keys.font);
         // - if the font is registered : safe to display
         // - else if it is not the bundled default font: a genuinely invalid value, so reset the key
-        // - else: this is the bundled default font, but not yet registered in the fontmap. Do nothing.
+        // - else: this is the bundled default font, but not yet registered in the fontMap. Do nothing.
 
         fontResetButton.set_visible(font !== defaultFont);
         syncingFont = false;
@@ -171,8 +171,48 @@ export function createLabelPage(settings, { pageTitle, pageIcon, keyPrefix }) {
     //#endregion
 
     //#region Decoration
-    const decoRow = new Adw.EntryRow({ title: _('Decoration') });
-    settings.bind(keys.deco, decoRow, 'text', Gio.SettingsBindFlags.DEFAULT);
+    const decoRow = new Adw.PreferencesRow({ title: _('Decoration'), activatable: false });
+
+    const decoEntries = ['left', 'right'].map(
+        side =>
+            new Gtk.Entry({
+                placeholder_text: side === 'left' ? _('Prefix') : _('Suffix'),
+                valign: Gtk.Align.CENTER,
+                hexpand: true,
+            })
+    );
+    decoEntries[0].set_alignment(1);
+
+    const syncDecoFromSettings = () => {
+        const stored = settings.get_strv(keys.deco);
+        decoEntries.forEach((entry, i) => {
+            const value = typeof stored[i] === 'string' ? stored[i] : '';
+            if (entry.get_text() !== value) entry.set_text(value);
+        });
+    };
+    syncDecoFromSettings();
+
+    decoEntries.forEach(entry =>
+        entry.connect('notify::text', () =>
+            settings.set_strv(
+                keys.deco,
+                decoEntries.map(e => e.get_text())
+            )
+        )
+    );
+    settings.connect(`changed::${keys.deco}`, () => syncDecoFromSettings());
+
+    const decoBox = new Gtk.Box({
+        orientation: Gtk.Orientation.HORIZONTAL,
+        spacing: 12,
+        margin_start: 12,
+        margin_end: 12,
+        margin_top: 8,
+        margin_bottom: 8,
+    });
+    decoBox.append(decoEntries[0]);
+    decoBox.append(decoEntries[1]);
+    decoRow.set_child(decoBox);
     appearanceGroup.add(decoRow);
     //#endregion
 
