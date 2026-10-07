@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: modernclock@gnome-port\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-24 21:36+0100\n"
-"PO-Revision-Date: 2026-09-25 00:17+0100\n"
+"POT-Creation-Date: 2026-10-07 13:28+0100\n"
+"PO-Revision-Date: 2026-10-07 14:02+0100\n"
 "Last-Translator: Djinn Alexio <djinnalexio+gnome@proton.me>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -16,15 +16,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Gtranslator 50.0\n"
+"X-Generator: Gtranslator 51.0\n"
 
-#: src/extension.js:520
+#: src/extension.js:593
 msgid "Modern Clock Fonts Installed"
 msgstr "Polices de Modern Clock installées"
 
-#: src/extension.js:521
+#: src/extension.js:594
 msgid "Log out and back in for the new fonts to take effect."
-msgstr "Déconnectez-vous puis reconnectez-vous pour que les nouvelles polices soient prises en compte."
+msgstr ""
+"Déconnectez-vous puis reconnectez-vous pour que les nouvelles polices soient "
+"prises en compte."
 
 #: src/prefs.js:36
 msgid "General"
@@ -42,7 +44,7 @@ msgstr "Date"
 msgid "Time"
 msgstr "Heure"
 
-#: src/prefs.js:69 src/prefs.js:86 src/prefs.js:110 src/prefs.js:155
+#: src/prefs.js:69 src/prefs.js:86 src/prefs.js:109 src/prefs.js:155
 #: src/prefs.js:170
 msgid "Format"
 msgstr "Format"
@@ -63,20 +65,20 @@ msgstr "24 heures"
 msgid "AM / PM"
 msgstr "AM / PM"
 
-#: src/prefsModules/aboutRow.js:45
+#: src/prefsModules/aboutRow.js:46
 msgid "About Modern Clock"
 msgstr "À propos de Modern Clock"
 
-#: src/prefsModules/aboutRow.js:69
+#: src/prefsModules/aboutRow.js:70
 msgctxt "(USER)NAME EMAIL"
 msgid "translator_credits"
 msgstr "Djinn Alexio <djinnalexio+gnome@proton.me>"
 
-#: src/prefsModules/aboutRow.js:73
+#: src/prefsModules/aboutRow.js:74
 msgid "Extension Page"
 msgstr "Page de l’extension"
 
-#: src/prefsModules/aboutRow.js:74
+#: src/prefsModules/aboutRow.js:75
 msgid "Based on"
 msgstr "Basé sur"
 
@@ -92,114 +94,122 @@ msgstr "Afficher"
 msgid "Font"
 msgstr "Police"
 
-#: src/prefsModules/labelPage.js:64
+#: src/prefsModules/labelPage.js:65
 msgid "Reset to default"
 msgstr "Réinitialiser"
 
-#: src/prefsModules/labelPage.js:116
+#: src/prefsModules/labelPage.js:114
 msgid "Size"
 msgstr "Taille"
 
-#: src/prefsModules/labelPage.js:118
-msgid "Small"
-msgstr "Petit"
-
-#: src/prefsModules/labelPage.js:118
+#: src/prefsModules/labelPage.js:116
 msgid "Large"
 msgstr "Grand"
 
-#: src/prefsModules/labelPage.js:125
+#: src/prefsModules/labelPage.js:116
+msgid "Small"
+msgstr "Petit"
+
+#: src/prefsModules/labelPage.js:123
 msgid "Letter Spacing"
 msgstr "Espacement des lettres"
 
-#: src/prefsModules/labelPage.js:127
+#: src/prefsModules/labelPage.js:125
 msgid "Narrow"
 msgstr "Étroit"
 
-#: src/prefsModules/labelPage.js:127
+#: src/prefsModules/labelPage.js:125
 msgid "Wide"
 msgstr "Large"
 
-#: src/prefsModules/labelPage.js:133
+#: src/prefsModules/labelPage.js:131
 msgid "Color"
 msgstr "Couleur"
 
-#: src/prefsModules/labelPage.js:161
+#: src/prefsModules/labelPage.js:159
 msgid "Use custom color"
 msgstr "Utiliser la couleur personnalisée"
 
-#: src/prefsModules/labelPage.js:175
+#: src/prefsModules/labelPage.js:173
 msgid "Decoration"
 msgstr "Décoration"
 
-#: src/prefsModules/mainPage.js:34
+#: src/prefsModules/labelPage.js:178
+msgid "Prefix"
+msgstr "Préfixe"
+
+#: src/prefsModules/labelPage.js:178
+msgid "Suffix"
+msgstr "Suffixe"
+
+#: src/prefsModules/mainPage.js:35
 msgid "Layout"
 msgstr "Disposition"
 
-#: src/prefsModules/mainPage.js:38
+#: src/prefsModules/mainPage.js:39
 msgid "Horizontal"
 msgstr "Horizontal"
 
-#: src/prefsModules/mainPage.js:40
+#: src/prefsModules/mainPage.js:41
 msgid "Left"
 msgstr "Gauche"
 
-#: src/prefsModules/mainPage.js:40
+#: src/prefsModules/mainPage.js:41
 msgid "Right"
 msgstr "Droite"
 
-#: src/prefsModules/mainPage.js:44
+#: src/prefsModules/mainPage.js:45
 msgid "Vertical"
 msgstr "Vertical"
 
-#: src/prefsModules/mainPage.js:46
-msgid "Top"
-msgstr "Haut"
-
-#: src/prefsModules/mainPage.js:46
+#: src/prefsModules/mainPage.js:47
 msgid "Bottom"
 msgstr "Bas"
 
-#: src/prefsModules/mainPage.js:69
+#: src/prefsModules/mainPage.js:47
+msgid "Top"
+msgstr "Haut"
+
+#: src/prefsModules/mainPage.js:68
 msgid "Language"
 msgstr "Langue"
 
-#: src/prefsModules/mainPage.js:75
+#: src/prefsModules/mainPage.js:74
 msgid "System"
 msgstr "Système"
 
-#: src/prefsModules/mainPage.js:77
+#: src/prefsModules/mainPage.js:76
 msgid ""
 "Use your time format language. Some characters may appear in a different "
 "font."
 msgstr ""
-"Utiliser la langue du format horaire. Certains caractères peuvent "
-"s’afficher dans une police différente."
+"Utiliser la langue du format horaire. Certains caractères peuvent s’afficher "
+"dans une police différente."
 
-#: src/prefsModules/mainPage.js:81
+#: src/prefsModules/mainPage.js:80
 msgid "Auto"
 msgstr "Auto"
 
-#: src/prefsModules/mainPage.js:83
+#: src/prefsModules/mainPage.js:82
 msgid ""
-"Use your time format language unless the default weekday font cannot display "
-"every weekday."
+"Use your time format language, falling back to English if the font does not "
+"support it."
 msgstr ""
-"Utiliser la langue du format horaire, sauf si la police par défaut du "
-"jour de la semaine ne peut pas afficher tous les jours."
+"Utiliser la langue du format horaire, ou l'anglais si la police ne peut pas "
+"l’afficher."
 
-#: src/prefsModules/mainPage.js:87
+#: src/prefsModules/mainPage.js:86
 msgid "English"
 msgstr "Anglais"
 
-#: src/prefsModules/mainPage.js:88
+#: src/prefsModules/mainPage.js:87
 msgid "Use English."
 msgstr "Afficher la date en anglais."
 
-#: src/prefsModules/mainPage.js:115 src/prefsModules/mainPage.js:140
+#: src/prefsModules/mainPage.js:112 src/prefsModules/mainPage.js:137
 msgid "Mode"
 msgstr "Mode"
 
-#: src/prefsModules/mainPage.js:165
+#: src/prefsModules/mainPage.js:161
 msgid "Information"
 msgstr "Informations"

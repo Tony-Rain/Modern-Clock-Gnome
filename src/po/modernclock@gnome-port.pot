@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-24 21:36+0100\n"
+"POT-Creation-Date: 2026-10-07 13:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/extension.js:520
+#: src/extension.js:593
 msgid "Modern Clock Fonts Installed"
 msgstr ""
 
-#: src/extension.js:521
+#: src/extension.js:594
 msgid "Log out and back in for the new fonts to take effect."
 msgstr ""
 
@@ -41,7 +41,7 @@ msgstr ""
 msgid "Time"
 msgstr ""
 
-#: src/prefs.js:69 src/prefs.js:86 src/prefs.js:110 src/prefs.js:155
+#: src/prefs.js:69 src/prefs.js:86 src/prefs.js:109 src/prefs.js:155
 #: src/prefs.js:170
 msgid "Format"
 msgstr ""
@@ -62,20 +62,20 @@ msgstr ""
 msgid "AM / PM"
 msgstr ""
 
-#: src/prefsModules/aboutRow.js:45
+#: src/prefsModules/aboutRow.js:46
 msgid "About Modern Clock"
 msgstr ""
 
-#: src/prefsModules/aboutRow.js:69
+#: src/prefsModules/aboutRow.js:70
 msgctxt "(USER)NAME EMAIL"
 msgid "translator_credits"
 msgstr ""
 
-#: src/prefsModules/aboutRow.js:73
+#: src/prefsModules/aboutRow.js:74
 msgid "Extension Page"
 msgstr ""
 
-#: src/prefsModules/aboutRow.js:74
+#: src/prefsModules/aboutRow.js:75
 msgid "Based on"
 msgstr ""
 
@@ -91,110 +91,118 @@ msgstr ""
 msgid "Font"
 msgstr ""
 
-#: src/prefsModules/labelPage.js:64
+#: src/prefsModules/labelPage.js:65
 msgid "Reset to default"
 msgstr ""
 
-#: src/prefsModules/labelPage.js:116
+#: src/prefsModules/labelPage.js:114
 msgid "Size"
 msgstr ""
 
-#: src/prefsModules/labelPage.js:118
-msgid "Small"
-msgstr ""
-
-#: src/prefsModules/labelPage.js:118
+#: src/prefsModules/labelPage.js:116
 msgid "Large"
 msgstr ""
 
-#: src/prefsModules/labelPage.js:125
+#: src/prefsModules/labelPage.js:116
+msgid "Small"
+msgstr ""
+
+#: src/prefsModules/labelPage.js:123
 msgid "Letter Spacing"
 msgstr ""
 
-#: src/prefsModules/labelPage.js:127
+#: src/prefsModules/labelPage.js:125
 msgid "Narrow"
 msgstr ""
 
-#: src/prefsModules/labelPage.js:127
+#: src/prefsModules/labelPage.js:125
 msgid "Wide"
 msgstr ""
 
-#: src/prefsModules/labelPage.js:133
+#: src/prefsModules/labelPage.js:131
 msgid "Color"
 msgstr ""
 
-#: src/prefsModules/labelPage.js:161
+#: src/prefsModules/labelPage.js:159
 msgid "Use custom color"
 msgstr ""
 
-#: src/prefsModules/labelPage.js:175
+#: src/prefsModules/labelPage.js:173
 msgid "Decoration"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:34
+#: src/prefsModules/labelPage.js:178
+msgid "Prefix"
+msgstr ""
+
+#: src/prefsModules/labelPage.js:178
+msgid "Suffix"
+msgstr ""
+
+#: src/prefsModules/mainPage.js:35
 msgid "Layout"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:38
+#: src/prefsModules/mainPage.js:39
 msgid "Horizontal"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:40
+#: src/prefsModules/mainPage.js:41
 msgid "Left"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:40
+#: src/prefsModules/mainPage.js:41
 msgid "Right"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:44
+#: src/prefsModules/mainPage.js:45
 msgid "Vertical"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:46
-msgid "Top"
-msgstr ""
-
-#: src/prefsModules/mainPage.js:46
+#: src/prefsModules/mainPage.js:47
 msgid "Bottom"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:69
+#: src/prefsModules/mainPage.js:47
+msgid "Top"
+msgstr ""
+
+#: src/prefsModules/mainPage.js:68
 msgid "Language"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:75
+#: src/prefsModules/mainPage.js:74
 msgid "System"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:77
+#: src/prefsModules/mainPage.js:76
 msgid ""
 "Use your time format language. Some characters may appear in a different "
 "font."
 msgstr ""
 
-#: src/prefsModules/mainPage.js:81
+#: src/prefsModules/mainPage.js:80
 msgid "Auto"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:83
+#: src/prefsModules/mainPage.js:82
 msgid ""
-"Use your time format language unless the default weekday font cannot display "
-"every weekday."
+"Use your time format language, falling back to English if the font does not "
+"support it."
 msgstr ""
 
-#: src/prefsModules/mainPage.js:87
+#: src/prefsModules/mainPage.js:86
 msgid "English"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:88
+#: src/prefsModules/mainPage.js:87
 msgid "Use English."
 msgstr ""
 
-#: src/prefsModules/mainPage.js:115 src/prefsModules/mainPage.js:140
+#: src/prefsModules/mainPage.js:112 src/prefsModules/mainPage.js:137
 msgid "Mode"
 msgstr ""
 
-#: src/prefsModules/mainPage.js:165
+#: src/prefsModules/mainPage.js:161
 msgid "Information"
 msgstr ""
