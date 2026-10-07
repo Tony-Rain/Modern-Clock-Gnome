@@ -37,6 +37,7 @@ const supportUrl = '';
 
 /**
  * Creates a row that opens an AboutDialog window with information about the extension.
+ *
  * @param {ExtensionMetadata} metadata - The metadata object from metadata.json.
  * @returns {Adw.ActionRow} The activatable row that opens the AboutDialog.
  */

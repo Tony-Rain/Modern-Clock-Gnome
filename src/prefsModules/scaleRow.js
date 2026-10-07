@@ -6,8 +6,10 @@ import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 
 /**
- * Creates a row with a horizontal slider over the range 0-1. The slider has five tick marks (0.1,
- * 0.25, 0.5, 0.75, 0.9) with the outer two labeled.
+ * Creates a row with a horizontal slider over the range 0-1.
+ *
+ * The slider has five tick marks (0.1, 0.25, 0.5, 0.75, 0.9) with the outer two labeled.
+ *
  * @param {Gio.Settings} settings - The settings object for this extension.
  * @param {object} options - The row configuration.
  * @param {string} options.title - The row title. Not displayed, but is used for search.

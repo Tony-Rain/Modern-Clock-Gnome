@@ -16,6 +16,7 @@ import { createScaleRow } from './scaleRow.js';
  *
  * The language group is left out when the LC_TIME language is already English, since all
  * three modes behave the same there.
+ *
  * @param {Gio.Settings} settings - The settings object for this extension.
  * @param {ExtensionMetadata} metadata - The metadata object from metadata.json.
  * @param {number} shellVersion - The GNOME Shell version.
