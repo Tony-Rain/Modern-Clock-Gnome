@@ -36,12 +36,13 @@ function coversText(font, text) {
 }
 function getSupport(fontFamily, names) {
     const font = loadFont(fontFamily);
-    if (font)
-        return {
-            long: coversText(font, names.long),
-            short: coversText(font, names.short),
-        };
-    else return { long: false, short: false };
+    const requested = fontFamily
+        .replace(/['"\\;{}]/g, '')
+        .trim()
+        .toLowerCase();
+    if (!font || font.describe().get_family().toLowerCase() !== requested)
+        return { long: false, short: false }; // font not installed (or not loaded yet)
+    return { long: coversText(font, names.long), short: coversText(font, names.short) };
 }
 
 /**

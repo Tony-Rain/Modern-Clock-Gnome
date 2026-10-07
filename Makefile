@@ -30,7 +30,7 @@ clean:
 
 install: pack
 	gnome-extensions install --force $(ZIP)
-	@echo "✓ Installed extension."
+	@echo "✓ Installed extension. Log out and back in to load the new version."
 
 uninstall: disable
 	gnome-extensions uninstall $(UUID)
