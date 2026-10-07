@@ -14,7 +14,7 @@ import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.j
 
 import { createLabelPage } from './prefsModules/labelPage.js';
 import { createMainPage } from './prefsModules/mainPage.js';
-import { getAnuratiWeekdaySupport } from './lib/utils.js';
+import { getMonthFontSupport } from './lib/utils.js';
 
 export default class ModernClockPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -110,26 +110,23 @@ export default class ModernClockPreferences extends ExtensionPreferences {
             model: Gtk.StringList.new([]),
         });
 
-        const anuratiWeekdaySupport = getAnuratiWeekdaySupport();
         const updateFormatExampleList = () => {
-            const mode = settings.get_string('language-mode');
-            const useEnglish =
-                mode === 'english' ||
-                (mode === 'auto' &&
-                    !(settings.get_string('weekday-format') === 'long'
-                        ? anuratiWeekdaySupport.long
-                        : anuratiWeekdaySupport.short));
-
             const exampleDate = GLib.DateTime.new_local(2026, 9, 1, 0, 0, 0);
-            // prettier-ignore
+            const mode = settings.get_string('language-mode');
+            const en = mode === 'english';
+            const auto = mode === 'auto';
+            const mfs = getMonthFontSupport(settings.get_string('date-font'));
+
             // date-format: 0 = 'numeric', 1 = 'text', 2 = 'long'
-            const strings = useEnglish
-                ? ['01.09.2026', '01 SEP 2026', '01 SEPTEMBER 2026']
-                : [
-                    exampleDate.format('%d.%m.%Y').toUpperCase(),
-                    exampleDate.format('%d %b %Y').toUpperCase(),
-                    exampleDate.format('%d %B %Y').toUpperCase(),
-                ];
+            const strings = [
+                exampleDate.format('%d.%m.%Y'),
+                en || (auto && !mfs.short)
+                    ? '01 SEP 2026'
+                    : exampleDate.format('%d %b %Y').toUpperCase(),
+                en || (auto && !mfs.long)
+                    ? '01 SEPTEMBER 2026'
+                    : exampleDate.format('%d %B %Y').toUpperCase(),
+            ];
             dateFormatRow.model.splice(0, dateFormatRow.model.get_n_items(), strings);
         };
         updateFormatExampleList();
@@ -138,7 +135,7 @@ export default class ModernClockPreferences extends ExtensionPreferences {
         dateFormatRow.connect('notify::selected', () =>
             settings.set_enum('date-format', dateFormatRow.get_selected())
         );
-        ['language-mode', 'weekday-format'].forEach(key =>
+        ['language-mode', 'date-font'].forEach(key =>
             settings.connect(`changed::${key}`, () => updateFormatExampleList())
         );
         settings.connect('changed::date-format', () =>

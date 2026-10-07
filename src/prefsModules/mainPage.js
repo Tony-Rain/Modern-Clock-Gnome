@@ -79,7 +79,7 @@ export function createMainPage(settings, metadata, shellVersion, { pageTitle, pa
             {
                 label: _('Auto'),
                 hint: _(
-                    'Use your time format language unless the default weekday font cannot display every weekday.'
+                    'Use your time format language, or English if the weekday or date font cannot show it.'
                 ),
             },
             {

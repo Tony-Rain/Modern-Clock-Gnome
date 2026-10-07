@@ -14,7 +14,7 @@ import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as MessageTray from 'resource:///org/gnome/shell/ui/messageTray.js';
 
-import { getAnuratiWeekdaySupport } from './lib/utils.js';
+import { getMonthFontSupport, getWeekdayFontSupport } from './lib/utils.js';
 
 //#region Constants
 // -- Base dimensions for 1080p ------------------------------------------------
@@ -28,9 +28,16 @@ const BASE_PADDING_TOP_TIME = 1;
 const SCALE_MIN = 0.25;
 const SCALE_MAX = 4;
 // -- English ------------------------------------------------------------------
-const WEEKDAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
-const WEEKDAYS_SHORT = WEEKDAYS.map(m => m.slice(0, 3));
-const MONTHS = [
+const EN_WEEKDAYS_LONG = [
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY',
+    'SUNDAY',
+];
+const EN_MONTH_LONG = [
     'JANUARY',
     'FEBRUARY',
     'MARCH',
@@ -44,7 +51,11 @@ const MONTHS = [
     'NOVEMBER',
     'DECEMBER',
 ];
-const MONTHS_SHORT = MONTHS.map(m => m.slice(0, 3));
+const EN_WEEKDAY_NAMES = {
+    long: EN_WEEKDAYS_LONG,
+    short: EN_WEEKDAYS_LONG.map(m => m.slice(0, 3)),
+};
+const EN_MONTH_NAMES = { long: EN_MONTH_LONG, short: EN_MONTH_LONG.map(m => m.slice(0, 3)) };
 // -- Color --------------------------------------------------------------------
 const HEX_RE = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const RGB_RE = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d*\.?\d+)\s*)?\)$/i;
@@ -85,8 +96,11 @@ export default class ModernClockExtension extends Extension {
 
         // -- Install fonts ----------------------------------------------------
         this._fontNotification = { source: null, notification: null };
-        this._anuratiWeekdaySupport = getAnuratiWeekdaySupport();
-        this._installFonts();
+        this._installFonts(); // fonts will not be loaded on first run
+        this._fontsSupport = {
+            weekday: getWeekdayFontSupport(this._settings.get_string('weekday-font')),
+            date: getMonthFontSupport(this._settings.get_string('date-font')),
+        };
 
         // -- Build clocks when the layout is ready ----------------------------
         this._clockWidgets = [];
@@ -111,7 +125,16 @@ export default class ModernClockExtension extends Extension {
         // -- Connect to settings changes --------------------------------------
         this._settings.connectObject(
             'changed',
-            () => {
+            (s_, key) => {
+                if (key === 'weekday-font')
+                    this._fontsSupport.weekday = getWeekdayFontSupport(
+                        this._settings.get_string('weekday-font')
+                    );
+                if (key === 'date-font')
+                    this._fontsSupport.date = getMonthFontSupport(
+                        this._settings.get_string('date-font')
+                    );
+
                 this._clockWidgets.forEach(clockWidget => {
                     this._updateClockText(clockWidget);
                     this._updateClockStyle(clockWidget);
@@ -191,7 +214,7 @@ export default class ModernClockExtension extends Extension {
 
         this._destroyAllClocks();
         this._clockWidgets = [];
-        this._anuratiWeekdaySupport = null;
+        this._fontsSupport = null;
         this._lastMonitorSnapshot = null;
         this._lastMinute = null;
         this._logger = null;
@@ -283,31 +306,39 @@ export default class ModernClockExtension extends Extension {
     _updateClockText(clockWidget) {
         const now = GLib.DateTime.new_now_local();
         const weekdayFormat = this._settings.get_string('weekday-format');
+        const dateFormat = this._settings.get_string('date-format');
         const mode = this._settings.get_string('language-mode');
-        const useEnglish =
-            mode === 'english' ||
-            (mode === 'auto' &&
-                !(weekdayFormat === 'long'
-                    ? this._anuratiWeekdaySupport.long
-                    : this._anuratiWeekdaySupport.short));
 
         // Weekday
         let weekday;
-        if (weekdayFormat === 'short') {
-            weekday = useEnglish
-                ? WEEKDAYS_SHORT[now.get_day_of_week() - 1]
-                : now.format('%a').toUpperCase();
-        } else {
-            weekday = useEnglish
-                ? WEEKDAYS[now.get_day_of_week() - 1]
+        const useEnglishWeekday =
+            mode === 'english' ||
+            (mode === 'auto' &&
+                !(weekdayFormat === 'long'
+                    ? this._fontsSupport.weekday.long
+                    : this._fontsSupport.weekday.short));
+        if (weekdayFormat === 'long') {
+            weekday = useEnglishWeekday
+                ? EN_WEEKDAY_NAMES.long[now.get_day_of_week() - 1]
                 : now.format('%A').toUpperCase();
+        } else {
+            weekday = useEnglishWeekday
+                ? EN_WEEKDAY_NAMES.short[now.get_day_of_week() - 1]
+                : now.format('%a').toUpperCase();
         }
+
         // Date
         let date;
-        switch (this._settings.get_string('date-format')) {
+        const useEnglishDate =
+            mode === 'english' ||
+            (mode === 'auto' &&
+                !(dateFormat === 'long'
+                    ? this._fontsSupport.date.long
+                    : this._fontsSupport.date.short));
+        switch (dateFormat) {
             case 'long':
-                date = useEnglish
-                    ? now.format(`%d ${MONTHS[now.get_month() - 1]} %Y`)
+                date = useEnglishDate
+                    ? now.format(`%d ${EN_MONTH_NAMES.long[now.get_month() - 1]} %Y`)
                     : now.format('%d %B %Y').toUpperCase();
                 break;
             case 'numeric':
@@ -315,11 +346,12 @@ export default class ModernClockExtension extends Extension {
                 break;
             case 'text':
             default:
-                date = useEnglish
-                    ? now.format(`%d ${MONTHS_SHORT[now.get_month() - 1]} %Y`)
+                date = useEnglishDate
+                    ? now.format(`%d ${EN_MONTH_NAMES.short[now.get_month() - 1]} %Y`)
                     : now.format('%d %b %Y').toUpperCase();
                 break;
         }
+
         // Time
         let time;
         if (this._settings.get_string('time-format') === '24h') {
