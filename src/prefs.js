@@ -1,49 +1,188 @@
-import Adw from 'gi://Adw';
-import Gtk from 'gi://Gtk';
-import Gio from 'gi://Gio';
+// SPDX-FileCopyrightText: 2026 Modern Clock for GNOME Contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import Adw from 'gi://Adw';
+import Gdk from 'gi://Gdk';
+import GLib from 'gi://GLib';
+import Gtk from 'gi://Gtk';
+
+import {
+    ExtensionPreferences,
+    gettext as _,
+} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
+
+import { createLabelPage } from './prefsModules/labelPage.js';
+import { createMainPage } from './prefsModules/mainPage.js';
+import { getMonthFontSupport } from './lib/utils.js';
 
 export default class ModernClockPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
+        window.default_width = 360;
+        window.default_height = 600;
+
+        // Add path for custom icons
+        const iconTheme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default());
+        const iconThemePath = GLib.build_filenamev([this.path, 'assets']);
+        if (!iconTheme.get_search_path().includes(iconThemePath))
+            iconTheme.add_search_path(iconThemePath);
+
         const settings = this.getSettings();
+        const shellVersion = parseFloat(Config.PACKAGE_VERSION);
 
-        // Page
-        const page = new Adw.PreferencesPage({
-            title: 'Modern Clock',
-            icon_name: 'preferences-system-time-symbolic',
-        });
-        window.add(page);
+        //#region Main page
+        window.add(
+            createMainPage(settings, this.metadata, shellVersion, {
+                pageTitle: _('General'),
+                pageIcon: 'org.gnome.Settings-symbolic',
+            })
+        );
+        //#endregion
 
-        // Time group
-        const timeGroup = new Adw.PreferencesGroup({
-            title: 'Time Format',
+        //#region Label pages
+        const weekdayPage = createLabelPage(settings, {
+            pageTitle: _('Weekday'),
+            pageIcon: 'today-alt2-symbolic',
+            keyPrefix: 'weekday',
         });
-        page.add(timeGroup);
 
-        // 24h toggle
-        const use24hRow = new Adw.SwitchRow({
-            title: '24-hour format',
-            subtitle: 'Use 24h instead of 12h AM/PM',
+        const datePage = createLabelPage(settings, {
+            pageTitle: _('Date'),
+            pageIcon: 'month-symbolic',
+            keyPrefix: 'date',
         });
-        settings.bind('use-24h', use24hRow, 'active', Gio.SettingsBindFlags.DEFAULT);
-        timeGroup.add(use24hRow);
+        const timePage = createLabelPage(settings, {
+            pageTitle: _('Time'),
+            pageIcon: 'preferences-system-time-symbolic',
+            keyPrefix: 'time',
+        });
+        [weekdayPage, datePage, timePage].forEach(page => window.add(page));
+        //#endregion
 
-        // Date format
-        const dateGroup = new Adw.PreferencesGroup({
-            title: 'Date Format',
+        //#region Weekday format row
+        const weekdayFormatGroup = new Adw.PreferencesGroup();
+        weekdayPage.add(weekdayFormatGroup);
+
+        let weekdayFormatRow;
+        let weekdayFormatToggleGroup;
+        if (shellVersion >= 48) {
+            weekdayFormatRow = new Adw.ActionRow({ title: _('Format') });
+            weekdayFormatToggleGroup = new Adw.ToggleGroup({
+                valign: Gtk.Align.CENTER,
+                homogeneous: true,
+            });
+            // weekday-format: 0 = 'long', 1 = 'short'
+            weekdayFormatToggleGroup.add(new Adw.Toggle({ label: _('Full'), name: 'long' }));
+            weekdayFormatToggleGroup.add(
+                new Adw.Toggle({ label: _('Abbreviated'), name: 'short' })
+            );
+            weekdayFormatToggleGroup.set_active(settings.get_enum('weekday-format'));
+            weekdayFormatRow.add_suffix(weekdayFormatToggleGroup);
+            weekdayFormatToggleGroup.connect('notify::active', () =>
+                settings.set_enum('weekday-format', weekdayFormatToggleGroup.get_active())
+            );
+        } else {
+            weekdayFormatRow = new Adw.ComboRow({
+                title: _('Format'),
+                model: Gtk.StringList.new([_('Full'), _('Abbreviated')]),
+                selected: settings.get_enum('weekday-format'),
+            });
+            weekdayFormatRow.connect('notify::selected', widget =>
+                settings.set_enum('weekday-format', widget.get_selected())
+            );
+        }
+
+        settings.connect('changed::weekday-format', () => {
+            const mode = settings.get_enum('weekday-format');
+            if (shellVersion >= 48) weekdayFormatToggleGroup.set_active(mode);
+            else weekdayFormatRow.set_selected(mode);
         });
-        page.add(dateGroup);
+
+        weekdayFormatGroup.add(weekdayFormatRow);
+        //#endregion
+
+        //#region Date format row
+        const dateFormatGroup = new Adw.PreferencesGroup();
+        datePage.add(dateFormatGroup);
 
         const dateFormatRow = new Adw.ComboRow({
-            title: 'Date format',
-            subtitle: 'How the date is displayed',
-            model: Gtk.StringList.new(['01 MAY 2026', '01.05.2026']),
+            title: _('Format'),
+            model: Gtk.StringList.new([]),
         });
-        dateFormatRow.set_selected(settings.get_string('date-format') === 'numeric' ? 1 : 0);
-        dateFormatRow.connect('notify::selected', () => {
-            settings.set_string('date-format', dateFormatRow.get_selected() === 1 ? 'numeric' : 'text');
+
+        const updateFormatExampleList = () => {
+            const exampleDate = GLib.DateTime.new_local(2026, 9, 1, 0, 0, 0);
+            const mode = settings.get_string('language-mode');
+            const en = mode === 'english';
+            const auto = mode === 'auto';
+            const mfs = getMonthFontSupport(settings.get_string('date-font'));
+
+            // date-format: 0 = 'numeric', 1 = 'text', 2 = 'long'
+            const strings = [
+                exampleDate.format('%d.%m.%Y'),
+                en || (auto && !mfs.short)
+                    ? '01 SEP 2026'
+                    : exampleDate.format('%d %b %Y').toUpperCase(),
+                en || (auto && !mfs.long)
+                    ? '01 SEPTEMBER 2026'
+                    : exampleDate.format('%d %B %Y').toUpperCase(),
+            ];
+            dateFormatRow.model.splice(0, dateFormatRow.model.get_n_items(), strings);
+        };
+        updateFormatExampleList();
+
+        dateFormatRow.set_selected(settings.get_enum('date-format'));
+        dateFormatRow.connect('notify::selected', () =>
+            settings.set_enum('date-format', dateFormatRow.get_selected())
+        );
+        ['language-mode', 'date-font'].forEach(key =>
+            settings.connect(`changed::${key}`, () => updateFormatExampleList())
+        );
+        settings.connect('changed::date-format', () =>
+            dateFormatRow.set_selected(settings.get_enum('date-format'))
+        );
+
+        dateFormatGroup.add(dateFormatRow);
+        //#endregion
+
+        //#region Time format row
+        const timeFormatGroup = new Adw.PreferencesGroup();
+        timePage.add(timeFormatGroup);
+
+        let timeFormatRow;
+        let timeFormatToggleGroup;
+        if (shellVersion >= 48) {
+            timeFormatRow = new Adw.ActionRow({ title: _('Format') });
+            timeFormatToggleGroup = new Adw.ToggleGroup({
+                valign: Gtk.Align.CENTER,
+                homogeneous: true,
+            });
+            // time-format: 0 = '24h', 1 = '12h'
+            timeFormatToggleGroup.add(new Adw.Toggle({ label: _('24-hour'), name: '24h' }));
+            timeFormatToggleGroup.add(new Adw.Toggle({ label: _('AM / PM'), name: '12h' }));
+            timeFormatToggleGroup.set_active(settings.get_enum('time-format'));
+            timeFormatRow.add_suffix(timeFormatToggleGroup);
+            timeFormatToggleGroup.connect('notify::active', () =>
+                settings.set_enum('time-format', timeFormatToggleGroup.get_active())
+            );
+        } else {
+            timeFormatRow = new Adw.ComboRow({
+                title: _('Format'),
+                model: Gtk.StringList.new([_('24-hour'), _('AM / PM')]),
+                selected: settings.get_enum('time-format'),
+            });
+            timeFormatRow.connect('notify::selected', widget =>
+                settings.set_enum('time-format', widget.get_selected())
+            );
+        }
+
+        settings.connect('changed::time-format', () => {
+            const mode = settings.get_enum('time-format');
+            if (shellVersion >= 48) timeFormatToggleGroup.set_active(mode);
+            else timeFormatRow.set_selected(mode);
         });
-        dateGroup.add(dateFormatRow);
+
+        timeFormatGroup.add(timeFormatRow);
+        //#endregion
     }
 }

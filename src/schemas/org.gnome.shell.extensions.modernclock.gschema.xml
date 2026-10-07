@@ -1,19 +1,181 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<schemalist>
-  <schema id="org.gnome.shell.extensions.modernclock" path="/org/gnome/shell/extensions/modernclock/">
-    <key name="use-24h" type="b">
-      <default>false</default>
-      <summary>Use 24-hour format</summary>
-      <description>Use 24-hour time format instead of 12-hour AM/PM</description>
-    </key>
-    <key name="date-format" type="s">
-      <default>'text'</default>
-      <summary>Date format</summary>
-      <description>text = 01 MAY 2026, numeric = 01.05.2026</description>
-    </key>
-    <key name="position" type="s">
-      <default>'center'</default>
-      <summary>Widget position</summary>
-    </key>
-  </schema>
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- SPDX-FileCopyrightText: 2026 Modern Clock for GNOME Contributors -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<schemalist gettext-domain='modernclock@gnome-port'>
+    <enum id='org.gnome.shell.extensions.modernclock.language-mode'>
+        <value value='0' nick='system'/>
+        <value value='1' nick='auto'/>
+        <value value='2' nick='english'/>
+    </enum>
+    <enum id='org.gnome.shell.extensions.modernclock.weekday-format'>
+        <value value='0' nick='long'/>
+        <value value='1' nick='short'/>
+    </enum>
+    <enum id='org.gnome.shell.extensions.modernclock.date-format'>
+        <value value='0' nick='numeric'/>
+        <value value='1' nick='text'/>
+        <value value='2' nick='long'/>
+    </enum>
+    <enum id='org.gnome.shell.extensions.modernclock.time-format'>
+        <value value='0' nick='24h'/>
+        <value value='1' nick='12h'/>
+    </enum>
+    <schema id='org.gnome.shell.extensions.modernclock' path='/org/gnome/shell/extensions/modernclock/'>
+        <!-- General -->
+        <key name='position-x' type='d'>
+            <default>0.5</default>
+            <range min='0' max='1'/>
+            <summary>Horizontal position</summary>
+            <description>Position of the widget on the desktop from 0 (left) to 1 (right).</description>
+        </key>
+        <key name='position-y' type='d'>
+            <default>0.5</default>
+            <range min='0' max='1'/>
+            <summary>Vertical position</summary>
+            <description>Position of the widget on the desktop from 0 (top) to 1 (bottom).</description>
+        </key>
+        <key name='language-mode' enum='org.gnome.shell.extensions.modernclock.language-mode'>
+            <default>'auto'</default>
+            <summary>Widget language</summary>
+            <description>
+                Language used by the widget. 'system': use the LC_TIME language. 'auto': use the
+                LC_TIME language, unless the default weekday font cannot display every weekday, in
+                which case use English. 'english': use English.
+            </description>
+        </key>
+        <key name='use-24h' type='b'>
+            <default>false</default>
+            <summary>Use 24-hour format (deprecated)</summary>
+            <description>Deprecated: replaced by time-format. Only read once to migrate the setting from older versions.</description>
+        </key>
+        <!-- Weekday -->
+        <key name='weekday-enabled' type='b'>
+            <default>true</default>
+            <summary>Show weekday</summary>
+            <description>Whether the weekday is shown in the widget.</description>
+        </key>
+        <key name='weekday-font' type='s'>
+            <default>'Anurati'</default>
+            <summary>Weekday font face</summary>
+            <description>Font face of the weekday.</description>
+        </key>
+        <key name='weekday-size-scale' type='d'>
+            <default>0.75</default>
+            <range min='0' max='1'/>
+            <summary>Weekday size scale</summary>
+            <description>A factor from 0 to 1 used to compute the font size of the weekday.</description>
+        </key>
+        <key name='weekday-tracking-scale' type='d'>
+            <default>0.6</default>
+            <range min='0' max='1'/>
+            <summary>Weekday letter spacing scale</summary>
+            <description>A factor from 0 to 1 used to compute the spacing between the letters of the weekday.</description>
+        </key>
+        <key name='weekday-color' type='s'>
+            <default>'rgba(255,255,255,1)'</default>
+            <summary>Weekday color</summary>
+            <description>Custom color of the weekday.</description>
+        </key>
+        <key name='weekday-color-enabled' type='b'>
+            <default>true</default>
+            <summary>Use custom weekday color</summary>
+            <description>Whether the weekday uses its custom color instead of the system accent color.</description>
+        </key>
+        <key name='weekday-decorations' type='as'>
+            <default><![CDATA[['','']]]></default>
+            <summary>Weekday decorations</summary>
+            <description>Characters displayed on either side of the weekday.</description>
+        </key>
+        <key name='weekday-format' enum='org.gnome.shell.extensions.modernclock.weekday-format'>
+            <default>'long'</default>
+            <summary>Weekday format</summary>
+            <description>Format of the weekday. 'long': full word, 'short': abbreviation.</description>
+        </key>
+        <!-- Date -->
+        <key name='date-enabled' type='b'>
+            <default>true</default>
+            <summary>Show date</summary>
+            <description>Whether the date is shown in the widget.</description>
+        </key>
+        <key name='date-font' type='s'>
+            <default>'Poppins'</default>
+            <summary>Date font face</summary>
+            <description>Font face of the date.</description>
+        </key>
+        <key name='date-size-scale' type='d'>
+            <default>0.25</default>
+            <range min='0' max='1'/>
+            <summary>Date size scale</summary>
+            <description>A factor from 0 to 1 used to compute the font size of the date label.</description>
+        </key>
+        <key name='date-tracking-scale' type='d'>
+            <default>0</default>
+            <range min='0' max='1'/>
+            <summary>Date letter spacing scale</summary>
+            <description>A factor from 0 to 1 used to compute the spacing between the letters of the date label.</description>
+        </key>
+        <key name='date-color' type='s'>
+            <default>'rgba(255,255,255,1)'</default>
+            <summary>Date color</summary>
+            <description>Custom color of the date.</description>
+        </key>
+        <key name='date-color-enabled' type='b'>
+            <default>true</default>
+            <summary>Use custom date color</summary>
+            <description>Whether the date uses its custom color instead of the system accent color.</description>
+        </key>
+        <key name='date-decorations' type='as'>
+            <default><![CDATA[['','']]]></default>
+            <summary>Date decorations</summary>
+            <description>Characters displayed on either side of the date.</description>
+        </key>
+        <key name='date-format' enum='org.gnome.shell.extensions.modernclock.date-format'>
+            <default>'text'</default>
+            <summary>Date format</summary>
+            <description>Format of the date. 'numeric': 01.09.2026, 'text': 01 SEP 2026, 'long': 01 SEPTEMBER 2026.</description>
+        </key>
+        <!-- Time -->
+        <key name='time-enabled' type='b'>
+            <default>true</default>
+            <summary>Show time</summary>
+            <description>Whether the time is shown in the widget.</description>
+        </key>
+        <key name='time-font' type='s'>
+            <default>'Poppins'</default>
+            <summary>Time font face</summary>
+            <description>Font face of the time.</description>
+        </key>
+        <key name='time-size-scale' type='d'>
+            <default>0.25</default>
+            <range min='0' max='1'/>
+            <summary>Time size scale</summary>
+            <description>A factor from 0 to 1 used to compute the font size of the time label.</description>
+        </key>
+        <key name='time-tracking-scale' type='d'>
+            <default>0</default>
+            <range min='0' max='1'/>
+            <summary>Time letter spacing scale</summary>
+            <description>A factor from 0 to 1 used to compute the spacing between the letters of the time label.</description>
+        </key>
+        <key name='time-color' type='s'>
+            <default>'rgba(255,255,255,1)'</default>
+            <summary>Time color</summary>
+            <description>Custom color of the time.</description>
+        </key>
+        <key name='time-color-enabled' type='b'>
+            <default>true</default>
+            <summary>Use custom time color</summary>
+            <description>Whether the time uses its custom color instead of the system accent color.</description>
+        </key>
+        <key name='time-decorations' type='as'>
+            <default><![CDATA[['-','-']]]></default>
+            <summary>Time decorations</summary>
+            <description>Characters displayed on either side of the time.</description>
+        </key>
+        <key name='time-format' enum='org.gnome.shell.extensions.modernclock.time-format'>
+            <default>'12h'</default>
+            <summary>Time format</summary>
+            <description>Format of the time. '24h': 18:30, '12h': 6:30 PM.</description>
+        </key>
+    </schema>
 </schemalist>

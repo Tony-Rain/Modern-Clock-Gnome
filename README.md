@@ -69,6 +69,7 @@ gnome-extensions prefs modernclock@gnome-port
 Or open the **Extensions** app → Modern Clock → the gear icon.
 
 Available there:
+
 - **24-hour format** — toggle between 12h AM/PM and 24h
 - **Date format** — text (`01 MAY 2026`) or numeric (`01.05.2026`)
 
@@ -81,10 +82,10 @@ Not exposed in the Settings UI yet — edit the constants at the top of `extensi
 ```
 
 ```javascript
-const POSITION  = 'center';      // center | top-right | top-left | bottom-right | bottom-left
-const MARGIN_X  = 60;            // horizontal margin
-const MARGIN_Y  = 80;            // vertical margin
-const TIME_CHAR = '-';           // character around time
+const POSITION = 'center'; // center | top-right | top-left | bottom-right | bottom-left
+const MARGIN_X = 60; // horizontal margin
+const MARGIN_Y = 80; // vertical margin
+const TIME_CHAR = '-'; // character around time
 ```
 
 After editing — log out and log back in.
@@ -119,15 +120,19 @@ fc-cache -f
 **Widget not visible** — make sure you logged out and back in (required on Wayland).
 
 **Settings window won't open** — make sure the schema compiled correctly:
+
 ```bash
 glib-compile-schemas ~/.local/share/gnome-shell/extensions/modernclock@gnome-port/schemas/
 ```
 
 **Wrong font** — check if Anurati is installed:
+
 ```bash
 fc-list | grep -i anurati
 ```
+
 If not found, install manually:
+
 ```bash
 mkdir -p ~/.local/share/fonts/modernclock
 cp ~/.local/share/gnome-shell/extensions/modernclock@gnome-port/fonts/* ~/.local/share/fonts/modernclock/
@@ -135,6 +140,7 @@ fc-cache -f
 ```
 
 **Logs:**
+
 ```bash
 journalctl --user -b 0 | grep -i ModernClock
 ```

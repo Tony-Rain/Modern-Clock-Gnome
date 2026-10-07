@@ -69,6 +69,7 @@ gnome-extensions prefs modernclock@gnome-port
 Или через приложение **Extensions** → Modern Clock → значок шестерёнки.
 
 Там доступно:
+
 - **24-часовой формат** — переключатель между 12ч AM/PM и 24ч
 - **Формат даты** — текстовый (`01 MAY 2026`) или числовой (`01.05.2026`)
 
@@ -81,10 +82,10 @@ gnome-extensions prefs modernclock@gnome-port
 ```
 
 ```javascript
-const POSITION  = 'center';      // center | top-right | top-left | bottom-right | bottom-left
-const MARGIN_X  = 60;            // отступ по горизонтали
-const MARGIN_Y  = 80;            // отступ по вертикали
-const TIME_CHAR = '-';           // символ вокруг времени
+const POSITION = 'center'; // center | top-right | top-left | bottom-right | bottom-left
+const MARGIN_X = 60; // отступ по горизонтали
+const MARGIN_Y = 80; // отступ по вертикали
+const TIME_CHAR = '-'; // символ вокруг времени
 ```
 
 После изменений — перелогинься.
@@ -119,15 +120,19 @@ fc-cache -f
 **Виджет не появился** — перелогинься (обязательно на Wayland).
 
 **Окно настроек не открывается** — проверь что схема скомпилирована:
+
 ```bash
 glib-compile-schemas ~/.local/share/gnome-shell/extensions/modernclock@gnome-port/schemas/
 ```
 
 **Неправильный шрифт** — проверь установку:
+
 ```bash
 fc-list | grep -i anurati
 ```
+
 Если пусто — установи вручную:
+
 ```bash
 mkdir -p ~/.local/share/fonts/modernclock
 cp ~/.local/share/gnome-shell/extensions/modernclock@gnome-port/fonts/* ~/.local/share/fonts/modernclock/
@@ -135,6 +140,7 @@ fc-cache -f
 ```
 
 **Логи:**
+
 ```bash
 journalctl --user -b 0 | grep -i ModernClock
 ```
