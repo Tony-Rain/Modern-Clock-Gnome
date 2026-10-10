@@ -25,9 +25,9 @@ const documenters = [];
 
 const copyright = '© 2026 Modern Clock for GNOME Contributors';
 const developerName = 'Modern Clock for GNOME Contributors';
-const extensionIcon = '';
+const extensionIcon = 'modern-clock-gnome-logo';
 const extensionPageUrl = 'https://extensions.gnome.org/extension/9882/modern-clock/';
-const issueUrl = 'https://github.com/Tony-Rain/Modern-Clock-Gnome/issues';
+const issueUrl = 'https://github.com/Tony-Rain/modern-clock-gnome/issues';
 const licenseType = Gtk.License.GPL_3_0;
 // The string for `release_notes` supports paragraphs <p>, emphasis (italics) <em>, code <code>,
 // and ordered <ol> and unordered <ul> lists with <li> list items.
@@ -74,6 +74,10 @@ export function createAboutRow(metadata) {
         aboutWindow.add_link(_('Extension Page'), extensionPageUrl);
         aboutWindow.add_acknowledgement_section(_('Based on'), [
             'Modern Clock for KDE https://github.com/Prayag2/kde_modernclock',
+        ]);
+        aboutWindow.add_acknowledgement_section(_('Fonts'), [
+            'Anurati https://www.behance.net/gallery/33704618/ANURATI-Free-font',
+            'Poppins https://github.com/itfoundry/poppins',
         ]);
         aboutWindow.present(row);
     });

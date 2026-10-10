@@ -175,7 +175,7 @@
         <key name='time-format' enum='org.gnome.shell.extensions.modernclock.time-format'>
             <default>'12h'</default>
             <summary>Time format</summary>
-            <description>Format of the time. '24h': 18:30, '12h': 6:30 PM.</description>
+            <description>Format of the time. '24h': 18:30, '12h': 06:30 PM.</description>
         </key>
     </schema>
 </schemalist>

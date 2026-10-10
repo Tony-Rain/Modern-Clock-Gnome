@@ -1,50 +1,65 @@
+<div align="center">
+
+[![Language: English][badge-readme-en]][readme-en]
+[![Язык: Русский][badge-readme-ru]][readme-ru]
+[![Langue : Français][badge-readme-fr]][readme-fr]
+
 # Modern Clock for GNOME
 
-> **[🇷🇺 Русская версия](README_RU.md)**
+<img alt="Modern Clock Logo" src="./src/assets/modern-clock-gnome-logo.png" height="100">
 
-[<img src="https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true" alt="Get it on GNOME Extensions" height="100">](https://extensions.gnome.org/extension/9882/modern-clock/)
+**A modern-looking clock widget for GNOME!**
 
-GNOME Shell extension — a port of [KDE Modern Clock](https://github.com/Prayag2/kde_modernclock) for GNOME. Same fonts (Anurati + Poppins), same design.
+[![Supported GNOME versions: 46 to 51][badge-shell]][ego-page]
+[![GNOME Extensions downloads][badge-downloads]][ego-page]
+[![License][badge-license]][license]
+</div>
 
 ## Features
 
-- Exact KDE Modern Clock design (Anurati font, Mond style)
-- GNOME 46–50
-- Multi-monitor support — renders on every display, correct z-order under windows
-- Auto-scaling based on monitor resolution
-- Auto font installation on first run
-- In-app settings: 24-hour format, date format
-- Desktop widget, rendered below all windows
-- Wayland & X11
+A desktop clock widget for GNOME, inspired by [Modern Clock for KDE][modern-clock-kde], and sharing its fonts and default look.
+
+- **Positioning** — can be placed anywhere on the desktop
+- **Auto-scaling** — text size scales with each monitor's size (HiDPI-aware)
+- **Multi-monitor support** — shown on every display and scaled independently
+- **Language** — follows your system locale, falls back to English if the font can't render it, or can be forced into English
+- **Show or hide** the weekday, date, and time independently
+- **Flexible formats** — full or abbreviated weekday, three date styles, 24-hour or AM/PM time
+- **Customizable** — font, size, letter spacing, color, and custom prefixes and suffixes for each line
+- **Optionally theme-aware** — can use your system accent color instead of a custom one
+
+> [!NOTE]
+> On first run, the bundled fonts are copied to `~/.local/share/fonts/modernclock`, and you need to log out and back in for them to take effect. After uninstalling the extension, you can delete that folder.
 
 ## Screenshots
 
-![Modern Clock](assets/Modern-Clock1.jpg)
+<div align="center">
 
-![Modern Clock](assets/Modern-Clock2.png)
+![Clock widget on a light wallpaper](./images/screenshot1.png)
+![Customized clock widget on a dark wallpaper](./images/screenshot2.png)
+
+</div>
 
 ## Installation
 
-### Method 1: From archive
+### From the GNOME Extensions Website (recommended)
 
-Download `modernclock@gnome-port.zip` from [Releases](https://github.com/Tony-Rain/modern-clock-gnome/releases).
+<a href="https://extensions.gnome.org/extension/9882/modern-clock/"><img alt="GNOME Extensions page" src="https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true" height="100"></a>
+
+### From the Repository
+
+> [!NOTE]
+> If installed from the repository, the extension will not receive automatic updates from the GNOME Extensions Website.
+
+#### Option 1: Release Zip
+
+Download `modernclock@gnome-port.zip` from [Releases][releases], then install it with:
 
 ```bash
-mkdir -p ~/.local/share/gnome-shell/extensions/modernclock@gnome-port
-unzip modernclock@gnome-port.zip -d ~/.local/share/gnome-shell/extensions/modernclock@gnome-port/
+gnome-extensions install -f modernclock@gnome-port.zip
 ```
 
-Log out and log back in so the system detects the new extension, then enable it:
-
-```bash
-gnome-extensions enable modernclock@gnome-port
-```
-
-Log out and log back in again for the extension to load.
-
-> Anurati and Poppins fonts are installed automatically on first run.
-
-### Method 2: From source
+#### Option 2: Build from Source
 
 ```bash
 git clone https://github.com/Tony-Rain/modern-clock-gnome.git
@@ -52,130 +67,60 @@ cd modern-clock-gnome
 make install
 ```
 
-Log out and log back in for the extension to load.
+#### Enable
 
-> On Wayland you must log out/in. On X11 you can press Alt+F2 → `r` → Enter.
+After installing the package, log out and back in (or just restart the shell with `Alt+F2` > `r` on X11), then enable the extension via the **Extensions** app or run:
+
+```bash
+gnome-extensions enable modernclock@gnome-port
+```
 
 ## Configuration
 
-### Settings UI
-
-Open the settings window:
+Open the preferences window via the **Extensions** app or run:
 
 ```bash
 gnome-extensions prefs modernclock@gnome-port
 ```
 
-Or open the **Extensions** app → Modern Clock → the gear icon.
+<div align="center">
 
-Available there:
+![Preferences window main page](./images/screenshot_prefs1.png)
+![Preferences window time page](./images/screenshot_prefs2.png)
 
-- **24-hour format** — toggle between 12h AM/PM and 24h
-- **Date format** — text (`01 MAY 2026`) or numeric (`01.05.2026`)
+</div>
 
-### Advanced: position, margins, character
+## Known Limitations
 
-Not exposed in the Settings UI yet — edit the constants at the top of `extension.js` directly:
+The clock doesn't show during the workspace switch animation (Wayland only), on the lock screen, or in the Activities overview. This is because the widget lives in the shell's background layer.
 
-```bash
-~/.local/share/gnome-shell/extensions/modernclock@gnome-port/extension.js
-```
+## Translations
 
-```javascript
-const POSITION = 'center'; // center | top-right | top-left | bottom-right | bottom-left
-const MARGIN_X = 60; // horizontal margin
-const MARGIN_Y = 80; // vertical margin
-const TIME_CHAR = '-'; // character around time
-```
-
-After editing — log out and log back in.
-
-## Uninstallation
-
-### Installed from archive (Method 1)
-
-```bash
-gnome-extensions disable modernclock@gnome-port
-rm -rf ~/.local/share/gnome-shell/extensions/modernclock@gnome-port
-```
-
-### Installed from source (Method 2)
-
-```bash
-cd modern-clock-gnome
-make uninstall
-```
-
-> `make uninstall` only works if you have the cloned repository with the Makefile.
-
-### Remove fonts (optional)
-
-```bash
-rm -rf ~/.local/share/fonts/modernclock
-fc-cache -f
-```
-
-## Troubleshooting
-
-**Widget not visible** — make sure you logged out and back in (required on Wayland).
-
-**Settings window won't open** — make sure the schema compiled correctly:
-
-```bash
-glib-compile-schemas ~/.local/share/gnome-shell/extensions/modernclock@gnome-port/schemas/
-```
-
-**Wrong font** — check if Anurati is installed:
-
-```bash
-fc-list | grep -i anurati
-```
-
-If not found, install manually:
-
-```bash
-mkdir -p ~/.local/share/fonts/modernclock
-cp ~/.local/share/gnome-shell/extensions/modernclock@gnome-port/fonts/* ~/.local/share/fonts/modernclock/
-fc-cache -f
-```
-
-**Logs:**
-
-```bash
-journalctl --user -b 0 | grep -i ModernClock
-```
-
-## Multi-monitor support
-
-Rendering a widget on secondary monitors in Wayland is non-trivial. Adding a `St.BoxLayout` to `Main.layoutManager._backgroundGroup` works on the primary monitor, but on secondary monitors the actor gets **zero allocation** in the secondary `ClutterStageView` — it simply doesn't render, with no errors.
-
-**The fix:** add a near-invisible background to the container:
-
-```javascript
-const container = new St.BoxLayout({
-    style: 'background-color: rgba(0, 0, 0, 0.01);',
-    // ...
-});
-Main.layoutManager._backgroundGroup.add_child(container);
-```
-
-Giving the actor something to paint forces Clutter to assign it a real allocation in the secondary monitor's stage view. Combined with `_backgroundGroup` (which implements `MetaCullable`), the widget renders correctly **below all windows on every monitor**, survives wallpaper changes and monitor hotplug.
-
-This behaviour is not documented in the GNOME Shell extension guides — discovered empirically while building this extension.
-
-> Tested on GNOME 46–50, Wayland.
-
-## Known limitations
-
-- Not visible during workspace switch animation (GNOME Shell limitation on Wayland)
-- Not visible in Activities overview
-
-## Credits
-
-- Original: [Prayag2/kde_modernclock](https://github.com/Prayag2/kde_modernclock) (GPL-3.0)
-- Design: Rainmeter skin "Mond"
-- Fonts: Anurati (SIL OFL), Poppins (SIL OFL / Apache 2.0)
+Translations are welcome! The extension uses `gettext`, so new languages only need a `.po` file. Translations of this README are also welcome: copy `README.md` to `README.<lang>.md` (for example, `README.es.md`), translate it, then add it to the language switcher at the top of each README.
 
 ## License
 
-GPL-3.0
+GNU General Public License v3.0 or later. See [LICENSE][license].
+
+The bundled fonts are covered by their own licenses and are not part of the GPL-licensed code.
+
+## Acknowledgements
+
+- Original: [Modern Clock for KDE][modern-clock-kde] by Prayag2
+- Fonts: [Anurati][anurati], [Poppins][poppins]
+
+[badge-readme-en]: https://img.shields.io/badge/Language-English-3584e4
+[badge-readme-fr]: https://img.shields.io/badge/Langue-Fran%C3%A7ais-9141ac
+[badge-readme-ru]: https://img.shields.io/badge/%D0%AF%D0%B7%D1%8B%D0%BA-%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9-e01b24
+[readme-en]: ./README.md
+[readme-fr]: ./README.fr.md
+[readme-ru]: ./README.ru.md
+[ego-page]: https://extensions.gnome.org/extension/9882/modern-clock/
+[license]: ./LICENSE
+[badge-shell]: https://img.shields.io/badge/GNOME_versions-46_--_51-3584e4?logo=gnome
+[badge-downloads]: https://img.shields.io/gnome-extensions/dt/modernclock%40gnome-port?logo=gnome&color=3584e4
+[badge-license]: https://img.shields.io/github/license/Tony-Rain/modern-clock-gnome
+[modern-clock-kde]: https://github.com/Prayag2/kde_modernclock
+[releases]: https://github.com/Tony-Rain/modern-clock-gnome/releases
+[anurati]: https://www.behance.net/gallery/33704618/ANURATI-Free-font
+[poppins]: https://github.com/itfoundry/poppins
