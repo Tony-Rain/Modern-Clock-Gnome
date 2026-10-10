@@ -4,8 +4,8 @@
     "scripts": {
         "lint": "eslint --fix src",
         "lint:check": "eslint src",
-        "format": "prettier --write docs src README.md",
-        "format:check": "prettier --check docs src README.md",
+        "format": "prettier --write src README.md",
+        "format:check": "prettier --check src README.md",
         "check": "npm run lint:check && npm run format:check"
     },
     "devDependencies": {

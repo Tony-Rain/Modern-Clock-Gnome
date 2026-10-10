@@ -1,10 +1,12 @@
 <div align="center">
 
-**[🇷🇺 Русская версия][README_RU]**
+[![Language: English][badge-readme-en]][readme-en]
+[![Язык: Русский][badge-readme-ru]][readme-ru]
+[![Langue : Français][badge-readme-fr]][readme-fr]
 
 # Modern Clock for GNOME
 
-<img alt="Modern Clock Logo" src="./src/assets/modern-clock-gnome-logo.png" height=100>
+<img alt="Modern Clock Logo" src="./src/assets/modern-clock-gnome-logo.png" height="100">
 
 **A modern-looking clock widget for GNOME!**
 
@@ -15,27 +17,27 @@
 
 ## Features
 
-A desktop clock widget for GNOME, inspired by [Modern Clock for KDE][modern-clock-kde], with the same fonts and default look.
+A desktop clock widget for GNOME, inspired by [Modern Clock for KDE][modern-clock-kde], and sharing its fonts and default look.
 
 - **Positioning** — can be placed anywhere on the desktop
 - **Auto-scaling** — text size scales with each monitor's size (HiDPI-aware)
 - **Multi-monitor support** — shown on every display and scaled independently
-- **Language** — follows your system locale, falls back to English if the font can’t render it, or force English
+- **Language** — follows your system locale, falls back to English if the font can't render it, or can be forced into English
 - **Show or hide** the weekday, date, and time independently
 - **Flexible formats** — full or abbreviated weekday, three date styles, 24-hour or AM/PM time
 - **Customizable** — font, size, letter spacing, color, and custom prefixes and suffixes for each line
-- **Theme-aware** — can use your system accent color instead of a custom one
+- **Optionally theme-aware** — can use your system accent color instead of a custom one
 
 > [!NOTE]
-> On first run, the bundled fonts are copied to `~/.local/share/fonts/modernclock`, and you need to log out and back in for them to take effect. After uninstalling the extension, you can delete that folder.”
+> On first run, the bundled fonts are copied to `~/.local/share/fonts/modernclock`, and you need to log out and back in for them to take effect. After uninstalling the extension, you can delete that folder.
 
 ## Screenshots
 
 <div align="center">
 
-![Modern Clock](./images/screenshot1.jpg)
+![Clock widget on a light wallpaper](./images/screenshot1.jpg)
 
-![Modern Clock](./images/screenshot2.png)
+![Clock widget on a dark wallpaper](./images/screenshot2.png)
 
 </div>
 
@@ -43,7 +45,7 @@ A desktop clock widget for GNOME, inspired by [Modern Clock for KDE][modern-cloc
 
 ### From the GNOME Extensions Website (recommended)
 
-<a href="https://extensions.gnome.org/extension/9882/modern-clock/"><img alt="GNOME Extensions page" src="https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true" height=100></a>
+<a href="https://extensions.gnome.org/extension/9882/modern-clock/"><img alt="GNOME Extensions page" src="https://raw.githubusercontent.com/andyholmes/gnome-shell-extensions-badge/master/get-it-on-ego.svg?sanitize=true" height="100"></a>
 
 ### From the Repository
 
@@ -76,7 +78,7 @@ gnome-extensions enable modernclock@gnome-port
 
 ## Configuration
 
-Open the settings window via the **Extensions** app or run:
+Open the preferences window via the **Extensions** app or run:
 
 ```bash
 gnome-extensions prefs modernclock@gnome-port
@@ -84,11 +86,11 @@ gnome-extensions prefs modernclock@gnome-port
 
 ## Known Limitations
 
-The clock doesn't show during the workspace switch animation (on Wayland), on the lock screen, or in the Activities overview. This is because the widget lives in the shell's background layer.
+The clock doesn't show during the workspace switch animation (Wayland only), on the lock screen, or in the Activities overview. This is because the widget lives in the shell's background layer.
 
 ## Translations
 
-Translations are welcome! The extension uses `gettext`, so new languages only need a `.po` file.
+Translations are welcome! The extension uses `gettext`, so new languages only need a `.po` file. Translations of this README are also welcome: copy `README.md` to `README.<lang>.md` (for example, `README.es.md`), translate it, then add it to the language switcher at the top of each README.
 
 ## License
 
@@ -101,7 +103,12 @@ The bundled fonts are covered by their own licenses and are not part of the GPL-
 - Original: [Modern Clock for KDE][modern-clock-kde] by Prayag2
 - Fonts: [Anurati][anurati], [Poppins][poppins]
 
-[README_RU]: ./docs/README_RU.md
+[badge-readme-en]: https://img.shields.io/badge/Language-English-3584e4
+[badge-readme-fr]: https://img.shields.io/badge/Langue-Fran%C3%A7ais-9141ac
+[badge-readme-ru]: https://img.shields.io/badge/%D0%AF%D0%B7%D1%8B%D0%BA-%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9-e01b24
+[readme-en]: ./README.md
+[readme-fr]: ./README.fr.md
+[readme-ru]: ./README.ru.md
 [ego-page]: https://extensions.gnome.org/extension/9882/modern-clock/
 [license]: ./LICENSE
 [badge-shell]: https://img.shields.io/badge/GNOME_versions-46_--_51-3584e4?logo=gnome
