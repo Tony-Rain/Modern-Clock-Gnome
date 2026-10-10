@@ -35,9 +35,8 @@ A desktop clock widget for GNOME, inspired by [Modern Clock for KDE][modern-cloc
 
 <div align="center">
 
-![Clock widget on a light wallpaper](./images/screenshot1.jpg)
-
-![Clock widget on a dark wallpaper](./images/screenshot2.png)
+![Clock widget on a light wallpaper](./images/screenshot1.png)
+![Customized clock widget on a dark wallpaper](./images/screenshot2.png)
 
 </div>
 
@@ -83,6 +82,13 @@ Open the preferences window via the **Extensions** app or run:
 ```bash
 gnome-extensions prefs modernclock@gnome-port
 ```
+
+<div align="center">
+
+![Preferences window main page](./images/screenshot_prefs1.png)
+![Preferences window time page](./images/screenshot_prefs2.png)
+
+</div>
 
 ## Known Limitations
 

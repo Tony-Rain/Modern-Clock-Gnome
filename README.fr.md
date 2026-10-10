@@ -35,9 +35,8 @@ Un widget d’horloge de bureau pour GNOME, inspiré de [Modern Clock for KDE][m
 
 <div align="center">
 
-![Capture d’écran 1](./images/screenshot1.jpg)
-
-![Capture d’écran 2](./images/screenshot2.png)
+![Widget horloge sur un fond d’écran clair](./images/screenshot1.png)
+![Widget horloge personnalisé sur un fond d’écran sombre](./images/screenshot2.png)
 
 </div>
 
@@ -83,6 +82,13 @@ Ouvrez la fenêtre des préférences via l’application **Extensions** ou exéc
 ```bash
 gnome-extensions prefs modernclock@gnome-port
 ```
+
+<div align="center">
+
+![Fenêtre des préférences : page principale](./images/screenshot_prefs1.png)
+![Fenêtre des préférences : page heure](./images/screenshot_prefs2.png)
+
+</div>
 
 ## Limitations connues
 
